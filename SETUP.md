@@ -62,7 +62,7 @@ One row per signup, with every questionnaire answer, plus:
 - The page posts in `no-cors` mode, so it cannot read the script's reply. Check the sheet's Delivery status to see what actually happened.
 - The sheet holds names, emails and WhatsApp numbers. Keep it private and only contact people who ticked the consent box.
 - No trackers or analytics. The only outside request is the Google Fonts stylesheet; the page works without it.
-- The example posts on step 3 are samples built from the person's answers. They use `[bracketed]` placeholders, never invented figures. Keep it that way if you edit the text in `buildSamples()` in `index.html`.
+- Step 3 shows one static post and one swipeable carousel (Instagram 4:5 style), built from the person's answers, plus three locked teasers (market insight, community insight, buyer / seller psychology). They use `[bracketed]` placeholders, never invented figures. Keep it that way if you edit the text in `buildExamples()` in `index.html`.
 
 ## Logo, popup and poster
 - `logo.png` (optimised, white background) is the header logo, favicon source and email logo. Emails load it from `PAGE_URL + 'logo.png'` (top of `apps-script.gs`), so keep the file in the repo.

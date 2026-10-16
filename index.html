@@ -159,21 +159,73 @@ select.inp{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 5
 /* examples */
 .disclaimer{margin:0 0 20px;border:1px dashed var(--line-s);border-radius:14px;padding:13px 14px;font-size:14px;color:#DCD6C8;background:rgba(255,255,255,.03)}
 .disclaimer b{color:var(--amber);font-weight:600}
-.sample{margin:0 0 26px}
-.sample .meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 8px}
-.sample .slot{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);font-weight:600}
-.sample .stag{white-space:nowrap;flex:none;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line-s);border-radius:6px;padding:2px 8px}
-.sample h3{font-family:var(--serif);font-size:22px;line-height:1.2;margin:0 0 10px;color:var(--text)}
-.slides{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -22px;padding:0 22px 6px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
-.slides::-webkit-scrollbar{display:none}
-.slide{flex:0 0 74%;scroll-snap-align:start;aspect-ratio:1/1;border-radius:16px;border:1px solid var(--line-s);padding:16px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(160deg,#18284A,#0F1A31);position:relative;overflow:hidden}
-.slide.one{flex:0 0 100%;aspect-ratio:auto;min-height:230px}
-.slide::after{content:"";position:absolute;right:-40px;top:-40px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(217,164,65,.22),transparent 70%)}
-.slide .sk{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:600}
-.slide .sh{font-family:var(--serif);font-size:23px;line-height:1.15;color:var(--text);margin:8px 0;position:relative;z-index:1}
-.slide .sb{font-size:13.5px;line-height:1.45;color:#CFD6E2;white-space:pre-line;position:relative;z-index:1}
-.slide .sn{font-size:11px;color:var(--muted);align-self:flex-end;letter-spacing:.06em}
-.slide .top{display:flex;justify-content:space-between;align-items:center}
+.ex1,.ex2,.more{margin:0 0 28px}
+.meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 6px}
+.meta .slot{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);font-weight:600}
+.meta .stag{white-space:nowrap;flex:none;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line-s);border-radius:6px;padding:2px 8px}
+.ex1 h3,.ex2 h3,.more h3{font-family:var(--serif);font-size:23px;line-height:1.2;margin:0 0 10px;color:var(--text)}
+.msub{color:var(--muted);font-size:14.5px;margin:-4px 0 12px}
+
+/* Instagram-style creative (4:5). 1u = 1% of the card width. */
+.ig{--u:3.4px;container-type:inline-size;position:relative;aspect-ratio:4/5;width:100%;overflow:hidden;border-radius:14px;color:var(--text);
+  background:radial-gradient(ellipse 80% 40% at 50% -6%,rgba(217,164,65,.30),transparent 70%),radial-gradient(ellipse 60% 40% at 100% 100%,rgba(217,164,65,.14),transparent 70%),linear-gradient(165deg,#16294C,#0B1220 66%);
+  border:1px solid rgba(217,164,65,.4);box-shadow:0 18px 40px -18px rgba(0,0,0,.8)}
+@supports (width:1cqw){.ig{--u:1cqw}}
+.ig::before{content:"";position:absolute;right:calc(var(--u)*-3);bottom:0;height:92%;width:calc(var(--u)*31);background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 300'%3E%3Cpolygon fill='%23D9A441' points='50,0 51.6,62 56,72 56,112 62,122 62,172 70,187 70,300 30,300 30,187 38,172 38,122 44,112 44,72 48.4,62'/%3E%3C/svg%3E") no-repeat right bottom/contain;opacity:.09;pointer-events:none}
+.ig *{box-sizing:border-box}
+.ig .in{position:absolute;inset:0;padding:calc(var(--u)*6.5) calc(var(--u)*7.5) calc(var(--u)*6.5);display:flex;flex-direction:column}
+.ig .hd{display:flex;align-items:center;justify-content:space-between;margin-bottom:calc(var(--u)*7)}
+.ig .lg{display:flex;background:#fff;border-radius:calc(var(--u)*2.2);padding:calc(var(--u)*1) calc(var(--u)*1.4)}
+.ig .lg img{display:block;height:calc(var(--u)*10);width:auto}
+.ig .samp{font-size:calc(var(--u)*2.6);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);border:1px solid rgba(242,235,221,.3);border-radius:calc(var(--u)*1.2);padding:calc(var(--u)*.7) calc(var(--u)*2)}
+.ig .kick{font-size:calc(var(--u)*3);letter-spacing:.18em;text-transform:uppercase;color:var(--amber);font-weight:600;margin-bottom:calc(var(--u)*2.4)}
+.ig .hl{font-family:var(--serif);font-weight:500;font-size:calc(var(--u)*9.4);line-height:1.04;letter-spacing:-.01em;color:var(--text);overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:6;position:relative}
+.ig .hl.big{font-size:calc(var(--u)*10.4);-webkit-line-clamp:6}
+.ig .rule{width:calc(var(--u)*13);height:calc(var(--u)*.7);background:var(--amber);border-radius:2px;margin:calc(var(--u)*4.4) 0 calc(var(--u)*4)}
+.ig .sub{font-size:calc(var(--u)*3.9);line-height:1.4;color:#D3DAE6;position:relative}
+.ig .area{font-size:calc(var(--u)*3.4);color:var(--amber);margin-top:calc(var(--u)*2.2);font-weight:500;position:relative}
+.ig .body{font-size:calc(var(--u)*4.4);line-height:1.38;color:#D3DAE6;overflow:hidden;display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:7;position:relative}
+.ig .num{font-family:var(--serif);font-variant-numeric:lining-nums;font-weight:600;font-size:calc(var(--u)*17);line-height:.9;color:rgba(217,164,65,.9);margin:0 0 calc(var(--u)*2.4)}
+.ig .hl.q{font-size:calc(var(--u)*8)}
+.ig .body.q{font-size:calc(var(--u)*4.1);-webkit-line-clamp:6}
+.ig .in{gap:0}
+.cap .ct.short{display:-webkit-box;-webkit-box-orient:vertical;-webkit-line-clamp:4;overflow:hidden}
+.ig .swipe{display:inline-flex;align-self:flex-start;align-items:center;gap:calc(var(--u)*1.6);font-size:calc(var(--u)*4);font-weight:600;color:#0B1220;background:var(--amber);border-radius:999px;padding:calc(var(--u)*2) calc(var(--u)*4.6)}
+.ig .pill{display:inline-block;align-self:flex-start;font-size:calc(var(--u)*4.4);font-weight:600;color:#0B1220;background:var(--amber);border-radius:999px;padding:calc(var(--u)*2.2) calc(var(--u)*5)}
+.ig .ft{margin-top:auto;display:flex;align-items:center;gap:calc(var(--u)*3);position:relative}
+.ig .av{flex:none;width:calc(var(--u)*11.5);height:calc(var(--u)*11.5);border-radius:50%;border:calc(var(--u)*.5) solid var(--amber);display:grid;place-items:center;font-family:var(--serif);font-weight:600;font-size:calc(var(--u)*5);color:var(--amber);background:rgba(217,164,65,.12)}
+.ig .who{min-width:0;flex:1}
+.ig .nm{font-family:var(--serif);font-size:calc(var(--u)*5.6);line-height:1.1;font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ig .ds{font-size:calc(var(--u)*3.3);color:var(--muted);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ig .pg{flex:none;font-size:calc(var(--u)*3.4);color:var(--muted);letter-spacing:.08em}
+.ig .ph{font-style:normal;color:var(--amber);border:1px dashed rgba(217,164,65,.75);border-radius:calc(var(--u)*1);padding:0 calc(var(--u)*1);background:rgba(217,164,65,.1);-webkit-box-decoration-break:clone;box-decoration-break:clone}
+/* carousel */
+.car{position:relative}
+.track{display:flex;gap:12px;overflow-x:auto;scroll-snap-type:x mandatory;-webkit-overflow-scrolling:touch;scrollbar-width:none;overscroll-behavior-x:contain;border-radius:14px}
+.track::-webkit-scrollbar{display:none}
+.track>.ig{flex:0 0 100%;scroll-snap-align:start;scroll-snap-stop:always}
+.track:focus-visible{outline-offset:4px}
+.carnav{display:flex;align-items:center;justify-content:space-between;gap:10px;margin:12px 0 0}
+.arr{appearance:none;width:44px;height:44px;border-radius:50%;border:1px solid var(--line-s);background:var(--card);color:var(--text);font:400 26px/1 var(--sans);cursor:pointer;display:grid;place-items:center;padding:0 0 3px}
+.arr:disabled{opacity:.35;cursor:default}
+.dots{display:flex;gap:2px;align-items:center}
+.dot{appearance:none;border:0;background:none;width:26px;height:44px;padding:0;cursor:pointer;position:relative}
+.dot::after{content:"";position:absolute;left:50%;top:50%;width:8px;height:8px;margin:-4px 0 0 -4px;border-radius:50%;background:var(--line-s);transition:all .25s}
+.dot.on::after{background:var(--amber);width:22px;margin-left:-11px;border-radius:5px}
+/* locked teasers */
+.locks{list-style:none;margin:0;padding:0;display:grid;grid-template-columns:repeat(3,1fr);gap:9px}
+.lock{position:relative;aspect-ratio:4/5;border-radius:12px;overflow:hidden;border:1px solid var(--line-s);background:linear-gradient(165deg,#1B2F55,#0F1A31)}
+.lock .bl{position:absolute;inset:-12%;filter:blur(9px);opacity:.9}
+.lock .bl i{position:absolute;display:block;border-radius:6px;background:rgba(242,235,221,.55)}
+.lock .bl i:nth-child(1){left:18%;top:20%;width:60%;height:10%}
+.lock .bl i:nth-child(2){left:18%;top:36%;width:44%;height:8%;background:rgba(217,164,65,.8)}
+.lock .bl i:nth-child(3){left:18%;top:54%;width:64%;height:6%}
+.lock .bl i:nth-child(4){left:18%;top:66%;width:52%;height:6%}
+.lock .ov{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;gap:5px;padding:8px 6px;background:rgba(11,18,32,.5)}
+.lock .ov svg{flex:none}
+.lock .ov b{font-size:12.5px;line-height:1.2;font-weight:600;color:var(--text)}
+.lock .ov span{font-size:10.5px;line-height:1.25;color:var(--amber)}
+@media (max-width:359px){.locks{grid-template-columns:1fr}.lock{aspect-ratio:auto;min-height:62px}.lock .ov{flex-direction:row;justify-content:flex-start;text-align:left;gap:10px;padding:10px 14px}.lock .ov b{font-size:14px}.lock .ov span{margin-left:auto;text-align:right;max-width:30%}}
 .cap{margin:10px 0 0;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:12px 14px}
 .cap .ck{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
 .cap .ct{font-size:14.5px;color:#DCD6C8;white-space:pre-line;line-height:1.5}
@@ -846,7 +898,7 @@ function finishQuestionnaire(){
   var btn = $("qNext"); btn.disabled = true; btn.textContent = "Saving…";
   submit(signup).then(function(){
     btn.disabled = false;
-    renderExamples(); show("ex");
+    renderExamples(); show("ex"); if(window.__carUpd) window.__carUpd();
   }).catch(function(){
     btn.disabled = false; btn.textContent = "See my content examples";
     var er = document.querySelector('.pane[data-pane="'+(NPANES-1)+'"] .err');
@@ -869,95 +921,116 @@ function lower(a){ return a.map(function(s){return s.toLowerCase()}); }
 function firstItem(s){ return String(s||"").split(/,|&|\/|;| and /i)[0].trim(); }
 function hashTag(s){ return "#"+String(s).replace(/[^A-Za-z0-9]/g,""); }
 
-function buildSamples(d){
+function phHtml(t){ return esc(t).replace(/\[([^\]]+)\]/g,'<span class="ph">[$1]</span>'); }
+function initials(n){ var p=String(n||"").trim().split(/\s+/).filter(Boolean); return ((p[0]||"?").charAt(0)+(p.length>1?p[p.length-1].charAt(0):"")).toUpperCase(); }
+
+/* Builds the two shown creatives (1 static + 1 carousel) from the visitor's answers.
+   Only qualitative wording and [placeholders]: no invented figures. */
+function buildExamples(d){
   var first = d.name.split(/\s+/)[0];
   var area = firstItem(d.areas) || "your area";
-  var comm = firstItem(d.communities) || area;
   var types = lower(d.propertyTypes); var typePhrase = types.length ? listJoin(types) : "property";
   var typeShort = types.length===1 ? types[0] : "property";
   var buyers = lower(d.targetBuyer); var buyerPhrase = buyers.length ? listJoin(buyers) : "buyers";
+  var sellers = lower(d.targetSeller.filter(function(x){return !/^not focused/i.test(x)}));
   var offplan = d.dealFocus==="Off-plan" || d.dealFocus==="Both";
-  var wantsSellers = d.goals.indexOf("Win more listings")>-1;
   var devs = d.developers ? listJoin(d.developers.split(/,|;/).map(function(x){return x.trim()}).filter(Boolean)) : "";
   var yearsLine = (d.years && d.years!=="Less than 1 year") ? d.years+" in Dubai real estate" : "";
   var langLine = d.languages.length ? "I work in "+listJoin(d.languages)+"." : "";
-  var S = [];
+  var who = {first:first, name:d.name, handle:d.instagram, area:area, typePhrase:typePhrase};
 
-  S.push({slot:"Post 1", kind:"Static", label:"Market insight",
-    slides:[{k:"Market insight · "+area, h:area+": this week in one look", b:ph("Latest figure + source")+"\n"+ph("Second figure + source")}],
-    caption:"A quick read on "+area+" this week 👇\n\n📊 "+ph("Latest figure + source")+"\n📊 "+ph("Second figure + source")+"\n\nWhat it may mean for "+buyerPhrase+": "+ph("one-line takeaway in plain English")+".\n\nThinking about "+typePhrase+" in "+area+"? Message me and I’ll walk you through what fits you.\n\n— "+first+"\n"+hashTag(area)+" #DubaiRealEstate"});
-
-  S.push({slot:"Post 2", kind:"Static", label:"Personal-brand authority",
-    slides:[{k:"Personal brand · "+first, h:"I don’t send you twenty listings. I help you choose the right one.", b:[yearsLine, area+" · "+typePhrase].filter(Boolean).join("\n")}],
-    caption:"My approach in "+area+" is simple: listen first, shortlist second.\n\nIf you’re looking at "+typePhrase+", I’d rather ask a few good questions than send a long list.\n\n"+[yearsLine?yearsLine+".":"", langLine].filter(Boolean).join(" ")+"\n\nWant a shortlist built around you? Send me a message.\n\n— "+first+" (@"+d.instagram+")"});
-
+  var stat = {
+    kick:"Personal brand", head:"I don’t send you twenty listings. I help you choose the right one.",
+    lines:["Buyers: "+buyerPhrase].concat(sellers.length ? ["Sellers: "+listJoin(sellers)] : []).concat(yearsLine ? [yearsLine] : []),
+    desc:typePhrase.charAt(0).toUpperCase()+typePhrase.slice(1)+" · "+area,
+    caption:"My approach in "+area+" is simple: listen first, shortlist second.\n\nIf you’re looking at "+typePhrase+", I’d rather ask a few good questions than send a long list.\n\n"+[yearsLine?yearsLine+".":"", langLine].filter(Boolean).join(" ")+"\n\nWant a shortlist built around you? Send me a message.\n\n— "+first+" (@"+d.instagram+")"
+  };
   var q2 = offplan
-    ? {h:"2. Who is the developer, and what is the handover timeline?", b:"Ask for the payment plan, the timeline and where the project stands."+(devs?"\n"+ph("Add your "+devs+" project details"):"")}
-    : {h:"2. What is the property’s current status?", b:"Is it vacant or tenanted? Ask which documents are needed to transfer it."};
-  S.push({slot:"Carousel 1", kind:"Carousel", label:"Educational",
+    ? {h:"Who is the developer, and what is the handover timeline?", b:"Ask for the payment plan, the timeline and where the project stands."+(devs?" [Add your "+devs+" project details]":"")}
+    : {h:"What is the property’s current status?", b:"Is it vacant or tenanted? Ask which documents are needed to transfer it."};
+  var car = {
+    caption:"3 questions to ask before buying "+typeShort+" in "+area+" 👇\n\nSave this for your next viewing. Not sure where to start? Send me a message, I’ll help you work through them.\n\n— "+first+"\n"+hashTag(area)+" #DubaiProperty",
     slides:[
-      {k:"Educational", h:"4 questions to ask before buying "+typeShort+" in "+area, b:"Swipe →"},
-      {k:"Question 1", h:"1. What is the total cost, not just the price?", b:"Ask about service charges, fees and any other costs. "+ph("Latest figure + source")},
-      {k:"Question 2", h:q2.h, b:q2.b},
-      {k:"Question 3", h:"3. Is it for living in or for investing?", b:"Your goal changes which "+typePhrase+" make sense in "+area+"."},
-      {k:"Question 4", h:"4. What is daily life like there?", b:"Visit at different times of day. Talk to people who live there."},
-      {k:"Next step", h:"Want a shortlist for "+area+"?", b:"Message "+first+"."}
-    ],
-    caption:"4 questions to ask before buying "+typeShort+" in "+area+" 👇\n\nSave this for your next viewing. Not sure where to start? Send me a message, I’ll help you work through them.\n\n— "+first+"\n"+hashTag(area)+" #DubaiProperty"});
-
-  S.push({slot:"Carousel 2", kind:"Carousel", label:"Community insight",
-    slides:[
-      {k:"Community insight", h:"Inside "+comm, b:"A local view from "+first},
-      {k:"The lifestyle", h:"What daily life feels like", b:ph("Your photo + one line on daily life")},
-      {k:"What’s available", h:"The "+typePhrase+" you’ll see here", b:ph("Options from your current inventory")},
-      {k:"Who it tends to suit", h:"Who it may suit", b:"For "+buyerPhrase+": "+ph("why it fits them, in your words")},
-      {k:"Next step", h:"Thinking about "+comm+"?", b:"Message "+first+" for a walkthrough."}
-    ],
-    caption:"A local look at "+comm+" 📍\n\nSwipe through what daily life looks like, what’s on offer and who it may suit.\n\nWant the details for your situation? Send me a message.\n\n— "+first+"\n"+hashTag(comm)+" #DubaiCommunities"});
-
-  var seller = wantsSellers;
-  S.push(seller ? {slot:"Carousel 3", kind:"Carousel", label:"Seller psychology",
-    slides:[
-      {k:"Seller psychology", h:"Thinking of selling in "+area+"? Why do so many owners wait?", b:"Swipe →"},
-      {k:"Often", h:"It can be about price expectations", b:"What an owner hopes for and what buyers are comparing can differ."},
-      {k:"Often", h:"Or about timing and the unknown", b:"Not knowing the steps can feel bigger than it is."},
-      {k:"What helps", h:"Clarity and a plan", b:"A clear view of the process, and honest numbers. "+ph("Add your approach")},
-      {k:"Next step", h:"Curious what your home could do?", b:"Message "+first+" for a no-pressure conversation."}
-    ],
-    caption:"Thinking about selling in "+area+" but not sure when? 🏡\n\nOften the hesitation is about pricing expectations and the unknown, not just the market.\n\nIf that sounds familiar, message me. No pressure, just a clear picture.\n\n— "+first}
-  : {slot:"Carousel 3", kind:"Carousel", label:"Buyer psychology",
-    slides:[
-      {k:"Buyer psychology", h:"“I’ll wait.” What’s really behind it?", b:"Swipe →"},
-      {k:"Often", h:"It’s about uncertainty, not only price", b:"Buyers can feel unsure about timing, the process or the numbers."},
-      {k:"What helps", h:"Clarity", b:"Clear next steps. Plain-English numbers. No pressure."},
-      {k:"What I do", h:"I answer the question behind the question", b:ph("Add your approach for "+buyerPhrase)},
-      {k:"Share it", h:"Know someone who’s unsure?", b:"Send them this, or message "+first+"."}
-    ],
-    caption:"When a buyer says “I’ll wait”, what do they usually mean? 🤔\n\nOften it’s uncertainty, not only price. For "+buyerPhrase+" looking at "+area+", clarity tends to help most.\n\nIf you’re in that spot, message me and let’s talk it through.\n\n— "+first});
-  return S;
+      {t:"cover", kick:"Educational", head:"3 questions to ask before buying "+typeShort+" in "+area},
+      {t:"q", n:"01", head:"What is the total cost, not just the price?", body:"Ask about service charges, fees and any other costs. [Latest figure + source]"},
+      {t:"q", n:"02", head:q2.h, body:q2.b},
+      {t:"q", n:"03", head:"Is it for living in or for investing?", body:"Your goal changes which "+typePhrase+" make sense in "+area+"."},
+      {t:"cta", head:"Want a shortlist for "+area+"?", body:"Send "+first+" a message."}
+    ]
+  };
+  return {who:who, stat:stat, car:car};
 }
 
-function captionHtml(c){ return esc(c).replace(/\[([^\]]+)\]/g,'<span class="ph">[$1]</span>'); }
-function slideBody(t){ return esc(t).replace(/\[([^\]]+)\]/g,'<span class="ph">[$1]</span>'); }
+function igHead(){ return '<div class="hd"><span class="lg"><img src="logo.png" alt="" ></span><span class="samp">Sample</span></div>'; }
+function igFoot(w, right){
+  return '<div class="ft"><div class="av" aria-hidden="true">'+esc(initials(w.name))+'</div><div class="who"><div class="nm">'+esc(w.name)+'</div><div class="ds">@'+esc(w.handle)+'</div></div>'+(right?'<div class="pg">'+esc(right)+'</div>':'')+'</div>';
+}
+function igStatic(x,w){
+  return '<div class="ig"><div class="in">'+igHead()+
+    '<div class="kick">'+esc(x.kick)+'</div><div class="hl">'+esc(x.head)+'</div><div class="rule"></div>'+
+    '<div class="sub">'+x.lines.map(function(l){return '<div>'+esc(l)+'</div>'}).join("")+'</div>'+
+    '<div class="area">'+esc(x.desc)+'</div>'+igFoot(w)+'</div></div>';
+}
+function igSlide(sl,w,i,n){
+  var inner;
+  if(sl.t==="cover"){
+    inner = '<div class="kick">'+esc(sl.kick)+'</div><div class="hl big">'+esc(sl.head)+'</div><div class="rule"></div><div class="swipe">Swipe <span aria-hidden="true">→</span></div>'+igFoot(w);
+  } else if(sl.t==="q"){
+    inner = '<div class="num" aria-hidden="true">'+esc(sl.n)+'</div><div class="hl q">'+esc(sl.head)+'</div><div class="rule" style="margin:calc(var(--u)*3.2) 0 calc(var(--u)*3)"></div><div class="body q">'+phHtml(sl.body)+'</div>'+igFoot(w,(i+1)+"/"+n);
+  } else {
+    inner = '<div class="kick">Next step</div><div class="hl">'+esc(sl.head)+'</div><div class="rule"></div><div class="pill">'+esc(sl.body)+'</div><div class="body" style="margin-top:calc(var(--u)*3)">@'+esc(w.handle)+'</div>'+igFoot(w,(i+1)+"/"+n);
+  }
+  return '<div class="ig slide" role="group" aria-roledescription="slide" aria-label="Slide '+(i+1)+' of '+n+'"><div class="in">'+igHead()+inner+'</div></div>';
+}
+function capPreview(c){ return '<div class="cap"><p class="ck">Caption preview</p><div class="ct short">'+phHtml(c)+'</div><p class="ck" style="margin:8px 0 0;text-transform:none;letter-spacing:0">Full caption comes with every post.</p></div>'; }
 
+var LOCK_ICON = '<svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="#D9A441" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="5" y="11" width="14" height="9" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>';
+function lockTile(title){
+  return '<li class="lock"><div class="bl" aria-hidden="true"><i></i><i></i><i></i><i></i></div><div class="ov">'+LOCK_ICON+'<b>'+esc(title)+'</b><span>Unlocks with your Sprint</span></div></li>';
+}
+
+var carIdx = 0;
 function renderExamples(){
-  var d = signup, S = buildSamples(d), first = d.name.split(/\s+/)[0];
-  $("exSub").textContent = first+", here’s a taste of your 9 AM delivery for "+(firstItem(d.areas)||"your market")+".";
-  var out = "";
-  S.forEach(function(s,i){
-    var n = s.slides.length, one = n===1;
-    var slides = s.slides.map(function(sl,j){
-      return '<div class="slide'+(one?' one':'')+'"><div class="top"><span class="sk">'+esc(sl.k)+'</span><span class="sk" style="color:var(--muted)">'+(one?'':(j+1)+'/'+n)+'</span></div>'+
-        '<div><div class="sh">'+esc(sl.h)+'</div><div class="sb">'+slideBody(sl.b)+'</div></div>'+
-        '<div class="sn">SAMPLE · RealtorOne</div></div>';
-    }).join("");
-    out += '<article class="sample" aria-label="Sample '+(i+1)+' of '+S.length+'">'+
-      '<div class="meta"><span class="slot">'+esc(s.slot)+(s.kind==='Static'?' · Static post':'')+'</span><span class="stag">Sample '+(i+1)+' of '+S.length+'</span></div>'+
-      '<h3>'+esc(s.label)+'</h3>'+
-      '<div class="slides" tabindex="0" aria-label="'+esc(s.label)+' sample slides">'+slides+'</div>'+
-      '<div class="cap"><p class="ck">Caption (sample)</p><div class="ct">'+captionHtml(s.caption)+'</div></div></article>';
-  });
-  $("samples").innerHTML = out;
+  var d = signup, E = buildExamples(d), first = E.who.first, n = E.car.slides.length;
+  $("exSub").textContent = first+", here’s a taste of your 9 AM delivery for "+E.who.area+": one static post and one carousel.";
+  var dots = E.car.slides.map(function(_,i){ return '<button type="button" class="dot" aria-label="Go to slide '+(i+1)+'"></button>'; }).join("");
+  $("samples").innerHTML =
+    '<section class="ex1" aria-label="Sample static post">'+
+      '<div class="meta"><span class="slot">Post 1 · Static post</span><span class="stag">Sample</span></div>'+
+      '<h3>Personal-brand authority</h3>'+ igStatic(E.stat,E.who) + capPreview(E.stat.caption) +
+    '</section>'+
+    '<section class="ex2" aria-label="Sample carousel">'+
+      '<div class="meta"><span class="slot">Carousel · '+n+' slides</span><span class="stag">Sample</span></div>'+
+      '<h3>Educational carousel</h3>'+
+      '<div class="car"><div class="track" id="carTrack" tabindex="0" role="region" aria-roledescription="carousel" aria-label="Sample carousel, swipe to see slides">'+
+        E.car.slides.map(function(sl,i){ return igSlide(sl,E.who,i,n); }).join("")+'</div>'+
+      '<div class="carnav"><button type="button" class="arr" id="carPrev" aria-label="Previous slide">‹</button><div class="dots" id="carDots">'+dots+'</div><button type="button" class="arr" id="carNext" aria-label="Next slide">›</button></div></div>'+
+      capPreview(E.car.caption)+
+    '</section>'+
+    '<section class="more" aria-label="More content angles in your Sprint"><h3>More in your Sprint</h3><p class="msub">Three more angles land in your 9 AM delivery every day.</p>'+
+      '<ul class="locks">'+lockTile("Market insight")+lockTile("Community insight")+lockTile("Buyer / seller psychology")+'</ul></section>';
+  initCarousel(n);
+}
+function initCarousel(n){
+  var tr = $("carTrack"), dots = [].slice.call($("carDots").children), prev = $("carPrev"), next = $("carNext");
+  var rm = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  function step(){ var s = tr.children[0], g = tr.children[1]; return (g && s) ? (g.offsetLeft - s.offsetLeft) : tr.clientWidth; }
+  function idx(){ var st = step(); if(!(st>0)) return 0; return Math.max(0, Math.min(n-1, Math.round(tr.scrollLeft / st))); }
+  function upd(){
+    var i = idx(); carIdx = i;
+    dots.forEach(function(b,j){ b.classList.toggle("on", j===i); if(j===i) b.setAttribute("aria-current","true"); else b.removeAttribute("aria-current"); });
+    prev.disabled = i===0; next.disabled = i===n-1;
+  }
+  function go(i){ i = Math.max(0, Math.min(n-1, i)); tr.scrollTo({left:i*step(), behavior: rm ? "auto" : "smooth"}); }
+  var tick = 0;
+  tr.addEventListener("scroll", function(){ if(tick) return; tick = requestAnimationFrame(function(){ tick = 0; upd(); }); }, {passive:true});
+  prev.addEventListener("click", function(){ go(idx()-1); });
+  next.addEventListener("click", function(){ go(idx()+1); });
+  dots.forEach(function(b,j){ b.addEventListener("click", function(){ go(j); }); });
+  tr.addEventListener("keydown", function(e){ if(e.key==="ArrowRight"){ e.preventDefault(); go(idx()+1); } else if(e.key==="ArrowLeft"){ e.preventDefault(); go(idx()-1); } });
+  window.addEventListener("resize", function(){ if(tr.isConnected){ tr.scrollLeft = carIdx*step(); upd(); } });
+  window.__carUpd = upd;
+  upd();
 }
 $("toPay").addEventListener("click", function(){ renderPay(); show("pay"); });
 
