@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>RealtorOne Content Sprint | Never wonder what to post again</title>
+<meta name="description" content="Every morning at 9 AM Dubai time, ready-to-post content built around your market, specialization and personal brand. 30 days. 150 pieces of content.">
+<meta name="theme-color" content="#0B1220">
+<meta property="og:type" content="website">
+<meta property="og:title" content="RealtorOne Content Sprint | Never wonder what to post again">
+<meta property="og:description" content="Ready-to-post Dubai real-estate content every morning at 9 AM. 30 days. 150 pieces of content.">
+<meta property="og:site_name" content="RealtorOne Content Sprint">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="RealtorOne Content Sprint | Never wonder what to post again">
+<meta name="twitter:description" content="Ready-to-post Dubai real-estate content every morning at 9 AM. 30 days. 150 pieces of content.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{color-scheme:dark;
+  --bg:#0B1220; --bg2:#101A2E; --card:#142038; --card-h:#1A2A48;
+  --line:rgba(242,235,221,.14); --line-s:rgba(242,235,221,.28);
+  --text:#F2EBDD; --muted:#A9B3C4; --amber:#D9A441; --amber-d:#B9852A; --err:#F0A08A;
+  --serif:"Cormorant Garamond",Cambria,Georgia,"Times New Roman",serif;
+  --sans:Inter,system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{margin:0;background:var(--bg);color:var(--text);font-family:var(--sans);font-size:16px;line-height:1.55;min-height:100vh;min-height:100dvh;
+  background-image:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(217,164,65,.10),transparent 70%),linear-gradient(180deg,var(--bg),var(--bg2));
+  background-attachment:fixed;-webkit-font-smoothing:antialiased}
+.app{max-width:480px;margin:0 auto;min-height:100vh;min-height:100dvh;display:flex;flex-direction:column;padding:0 22px env(safe-area-inset-bottom)}
+header.top{display:flex;align-items:center;justify-content:space-between;padding:18px 0 10px;min-height:56px}
+.brand{font-family:var(--serif);font-size:19px;font-weight:600;letter-spacing:.01em;color:var(--text);display:flex;align-items:center;gap:9px}
+.brand svg{width:20px;height:20px;flex:none}
+.tag{font-size:11.5px;color:var(--muted);letter-spacing:.02em}
+main{flex:1;display:flex;flex-direction:column;position:relative}
+.screen{display:none;flex:1;flex-direction:column;padding:6px 0 28px;outline:none}
+.screen.active{display:flex;animation:in .45s cubic-bezier(.2,.7,.2,1) both}
+.screen.back.active{animation-name:inBack}
+@keyframes in{from{opacity:0;transform:translateX(18px)}to{opacity:1;transform:none}}
+@keyframes inBack{from{opacity:0;transform:translateX(-18px)}to{opacity:1;transform:none}}
+h1,h2,h3{font-family:var(--serif);font-weight:500;margin:0;letter-spacing:-.005em}
+h1{font-size:46px;line-height:1.02}
+h2{font-size:30px;line-height:1.14}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:500;margin:0 0 14px}
+.lede{color:var(--muted);font-size:17px;margin:16px 0 0}
+.amber{color:var(--amber)}
+em{font-family:var(--serif);font-style:italic;font-size:1.06em}
+.btn{appearance:none;border:0;width:100%;background:var(--amber);color:#0B1220;font:600 16px/1.25 var(--sans);padding:18px 22px;border-radius:14px;cursor:pointer;transition:transform .15s,background .2s,box-shadow .2s;box-shadow:0 8px 26px -10px rgba(217,164,65,.55);text-align:center;text-decoration:none;display:block;min-height:54px}
+.btn:hover{background:#E3B352}
+.btn:active{transform:scale(.985)}
+.btn[disabled]{opacity:.6;cursor:default}
+.btn.ghost{background:transparent;color:var(--text);border:1px solid var(--line-s);box-shadow:none}
+.btn.ghost:hover{background:rgba(255,255,255,.04)}
+.note{font-size:13.5px;color:var(--muted);text-align:center;margin:14px 0 0}
+:focus-visible{outline:2px solid var(--amber);outline-offset:3px;border-radius:8px}
+.link{background:none;border:0;color:var(--muted);font:inherit;font-size:14px;text-decoration:underline;text-underline-offset:3px;cursor:pointer;padding:10px 6px;min-height:44px}
+.link:hover{color:var(--text)}
+[hidden]{display:none!important}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.hp{position:absolute!important;left:-9999px;width:1px;height:1px;overflow:hidden}
+
+/* pitch */
+.price{margin:24px 0 0;border:1px solid rgba(217,164,65,.45);border-radius:18px;padding:18px 18px 16px;background:linear-gradient(180deg,rgba(217,164,65,.12),rgba(217,164,65,.03))}
+.price .row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.price .amt{font-family:var(--serif);font-variant-numeric:lining-nums;font-size:50px;font-weight:600;line-height:1;color:var(--text)}
+.price .per{font-size:15px;color:var(--muted)}
+.price .reg{font-size:13.5px;color:var(--muted);margin:6px 0 0}
+.price .reg s{text-decoration-thickness:1.5px}
+.badge{display:inline-block;background:rgba(217,164,65,.16);color:var(--amber);font-size:12.5px;font-weight:600;padding:5px 11px;border-radius:999px;margin:0 0 12px}
+.price .fine{font-size:13.5px;color:#DCD6C8;margin:10px 0 0}
+.quick{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0;padding:0;list-style:none}
+.quick li{font-size:13px;color:#DCD6C8;border:1px solid var(--line);border-radius:999px;padding:6px 12px;background:rgba(255,255,255,.03)}
+.sec{border-top:1px solid var(--line);margin-top:34px;padding-top:30px}
+.sec h2{font-size:31px;margin:0 0 12px}
+.sec p{margin:0 0 12px;color:#DCD6C8;font-size:16px}
+.sec .sub{color:var(--muted);font-size:15px}
+.qlist{list-style:none;margin:16px 0 0;padding:0;display:flex;flex-direction:column;gap:9px}
+.qlist li{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:12px 14px;font-size:15.5px;color:var(--text);display:flex;gap:11px;align-items:flex-start;line-height:1.4}
+.qlist li::before{content:"?";flex:none;width:22px;height:22px;border-radius:50%;border:1px solid var(--line-s);display:grid;place-items:center;font-size:12px;color:var(--amber);margin-top:1px}
+.crumbs{list-style:none;margin:0 0 8px;padding:0;display:flex;flex-wrap:wrap;gap:2px 6px;font-size:13.5px;color:var(--muted);line-height:1.5}
+.crumbs li::after{content:"→";margin-left:6px;color:var(--amber)}
+.crumbs li:last-child::after{content:none}
+.crumbs li:last-child{color:var(--text);font-weight:500}
+.promise{margin:22px 0 0;padding:18px;border:1px solid rgba(217,164,65,.38);border-radius:16px;background:linear-gradient(180deg,rgba(217,164,65,.12),rgba(217,164,65,.04))}
+.promise p{margin:0;font-family:var(--serif);font-size:25px;line-height:1.2;color:var(--text)}
+.promise p+p{margin-top:4px}
+.timeline{list-style:none;margin:20px 0 0;padding:0 0 0 22px;position:relative}
+.timeline::before{content:"";position:absolute;left:5px;top:6px;bottom:10px;width:1px;background:var(--line-s)}
+.timeline li{position:relative;padding:0 0 16px}
+.timeline li::before{content:"";position:absolute;left:-22px;top:7px;width:11px;height:11px;border-radius:50%;background:var(--bg);border:1.5px solid var(--amber)}
+.timeline .when{font-size:12px;letter-spacing:.12em;text-transform:uppercase;color:var(--amber);font-weight:600}
+.timeline .what{font-size:16px;color:var(--text);margin:2px 0 0}
+.timeline .kind{display:inline-block;font-size:11px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:1px 7px;margin-left:8px;vertical-align:2px}
+.timeline .caps{margin:-2px 0 0}
+.tiles{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:8px 0 14px}
+.tile{border:1px solid var(--line);border-radius:14px;padding:13px 14px;background:var(--card)}
+.tile b{display:block;font-family:var(--serif);font-variant-numeric:lining-nums;font-size:32px;font-weight:600;line-height:1.1;color:var(--text)}
+.tile span{font-size:13px;color:var(--muted)}
+.tile.wide{grid-column:1/-1;border-color:var(--amber);background:rgba(217,164,65,.09)}
+.checks{list-style:none;margin:14px 0 0;padding:0}
+.checks li{position:relative;padding:0 0 0 30px;margin:0 0 11px;font-size:15.5px;color:#DCD6C8}
+.checks li::before{content:"";position:absolute;left:3px;top:.3em;width:6px;height:11px;border:solid var(--amber);border-width:0 2px 2px 0;transform:rotate(45deg)}
+.steps{list-style:none;counter-reset:s;margin:16px 0 0;padding:0}
+.steps li{counter-increment:s;position:relative;padding:0 0 14px 40px;font-size:15.5px;color:#DCD6C8}
+.steps li::before{content:counter(s);position:absolute;left:0;top:-1px;width:28px;height:28px;border-radius:50%;border:1px solid var(--amber);display:grid;place-items:center;font-family:var(--serif);font-size:16px;color:var(--amber)}
+.steps li b{color:var(--text);font-weight:500}
+.quote{font-family:var(--serif);font-style:italic;font-size:24px;line-height:1.25;color:var(--text);margin:22px 0 0;padding-left:16px;border-left:2px solid var(--amber)}
+.disc{font-size:12.5px;color:var(--muted);margin:14px 0 0}
+.sticky{position:sticky;bottom:0;z-index:5;margin:18px -22px 0;padding:22px 22px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(16,26,46,0),rgba(16,26,46,.94) 40%)}
+.sticky .btn{box-shadow:0 10px 30px -8px rgba(0,0,0,.6),0 8px 26px -10px rgba(217,164,65,.55)}
+
+/* stepper */
+.stepper{display:flex;gap:6px;margin:4px 0 0;padding:0;list-style:none}
+.stepper li{flex:1;font-size:11px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);text-align:center;padding-top:9px;position:relative;border-top:2px solid var(--line)}
+.stepper li.done{border-top-color:var(--amber-d);color:var(--muted)}
+.stepper li.cur{border-top-color:var(--amber);color:var(--amber);font-weight:600}
+.qhead{display:flex;align-items:center;justify-content:space-between;margin:6px 0 10px;min-height:44px}
+.count{font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums;letter-spacing:.04em}
+.count b{color:var(--text);font-weight:600}
+.back{background:none;border:0;color:var(--muted);font:500 14px var(--sans);cursor:pointer;padding:10px 6px 10px 0;min-height:44px;display:flex;align-items:center;gap:6px}
+.back:hover{color:var(--text)}
+.bar{height:3px;background:var(--line);border-radius:3px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--amber-d),var(--amber));border-radius:3px;transition:width .5s cubic-bezier(.2,.7,.2,1)}
+.fh{margin:26px 0 8px}
+.fh h2{font-size:30px}
+.fsub{color:var(--muted);font-size:15px;margin:0 0 20px}
+
+/* form */
+label.f{display:block;font-size:13px;color:var(--muted);margin:0 0 6px;font-weight:500}
+label.f i{font-style:normal;color:#7C879B;font-weight:400}
+.inp{width:100%;background:var(--card);color:var(--text);border:1px solid var(--line-s);border-radius:12px;padding:15px 14px;font:400 16px var(--sans);min-height:52px;margin-bottom:14px;appearance:none;-webkit-appearance:none}
+select.inp{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 50%),linear-gradient(135deg,var(--muted) 50%,transparent 50%);background-position:calc(100% - 20px) 50%,calc(100% - 15px) 50%;background-size:5px 5px;background-repeat:no-repeat;padding-right:38px}
+.inp::placeholder{color:#6F7B90}
+.inp:focus{outline:2px solid var(--amber);outline-offset:1px;border-color:var(--amber)}
+.inp.bad{border-color:var(--err)}
+.hint{font-size:12.5px;color:var(--muted);margin:-6px 0 14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin:0 0 14px;padding:2px}
+.chips.bad{outline:1px solid var(--err);border-radius:12px}
+.chip{appearance:none;background:var(--card);color:var(--text);border:1px solid var(--line-s);border-radius:999px;padding:10px 14px;font:400 14.5px/1.2 var(--sans);cursor:pointer;min-height:44px;transition:background .2s,border-color .2s}
+.chip:hover{background:var(--card-h)}
+.chip[aria-pressed="true"],.chip[aria-checked="true"]{border-color:var(--amber);background:rgba(217,164,65,.14);color:var(--text);box-shadow:inset 0 0 0 1px var(--amber)}
+.consent{display:flex;gap:12px;align-items:flex-start;font-size:13.5px;color:var(--muted);margin:6px 0 18px;line-height:1.45;cursor:pointer}
+.consent input{flex:none;width:22px;height:22px;margin:0;accent-color:var(--amber);cursor:pointer}
+.err{color:var(--err);font-size:13.5px;margin:-4px 0 14px}
+.err:empty{display:none}
+.navrow{display:flex;gap:10px;margin-top:8px}
+.navrow .btn.ghost{flex:0 0 34%}
+.navrow .btn{flex:1}
+.pane{display:none}
+.pane.active{display:block;animation:in .35s cubic-bezier(.2,.7,.2,1) both}
+
+/* examples */
+.disclaimer{margin:0 0 20px;border:1px dashed var(--line-s);border-radius:14px;padding:13px 14px;font-size:14px;color:#DCD6C8;background:rgba(255,255,255,.03)}
+.disclaimer b{color:var(--amber);font-weight:600}
+.sample{margin:0 0 26px}
+.sample .meta{display:flex;align-items:center;justify-content:space-between;gap:8px;margin:0 0 8px}
+.sample .slot{font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);font-weight:600}
+.sample .stag{white-space:nowrap;flex:none;font-size:10.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);border:1px solid var(--line-s);border-radius:6px;padding:2px 8px}
+.sample h3{font-family:var(--serif);font-size:22px;line-height:1.2;margin:0 0 10px;color:var(--text)}
+.slides{display:flex;gap:10px;overflow-x:auto;scroll-snap-type:x mandatory;margin:0 -22px;padding:0 22px 6px;-webkit-overflow-scrolling:touch;scrollbar-width:none}
+.slides::-webkit-scrollbar{display:none}
+.slide{flex:0 0 74%;scroll-snap-align:start;aspect-ratio:1/1;border-radius:16px;border:1px solid var(--line-s);padding:16px;display:flex;flex-direction:column;justify-content:space-between;background:linear-gradient(160deg,#18284A,#0F1A31);position:relative;overflow:hidden}
+.slide.one{flex:0 0 100%;aspect-ratio:auto;min-height:230px}
+.slide::after{content:"";position:absolute;right:-40px;top:-40px;width:120px;height:120px;border-radius:50%;background:radial-gradient(circle,rgba(217,164,65,.22),transparent 70%)}
+.slide .sk{font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--amber);font-weight:600}
+.slide .sh{font-family:var(--serif);font-size:23px;line-height:1.15;color:var(--text);margin:8px 0;position:relative;z-index:1}
+.slide .sb{font-size:13.5px;line-height:1.45;color:#CFD6E2;white-space:pre-line;position:relative;z-index:1}
+.slide .sn{font-size:11px;color:var(--muted);align-self:flex-end;letter-spacing:.06em}
+.slide .top{display:flex;justify-content:space-between;align-items:center}
+.cap{margin:10px 0 0;border:1px solid var(--line);border-radius:14px;background:var(--card);padding:12px 14px}
+.cap .ck{font-size:11px;letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin:0 0 6px}
+.cap .ct{font-size:14.5px;color:#DCD6C8;white-space:pre-line;line-height:1.5}
+.ph{color:var(--amber);background:rgba(217,164,65,.10);border-radius:4px;padding:0 3px}
+
+/* pay + welcome */
+.paycard{margin:6px 0 0;border:1px solid rgba(217,164,65,.45);border-radius:18px;padding:20px 18px;background:linear-gradient(180deg,rgba(217,164,65,.12),rgba(217,164,65,.03))}
+.paycard .amt{font-family:var(--serif);font-variant-numeric:lining-nums;font-size:48px;font-weight:600;line-height:1}
+.paycard .per{font-size:15px;color:var(--muted);margin-left:6px}
+.paycard ul{margin:16px 0 18px}
+.preview-box{border:1px dashed var(--err);border-radius:14px;padding:14px;margin:0 0 14px;font-size:14px;color:#F6D2C6;background:rgba(240,160,138,.07)}
+.preview-box b{color:var(--err)}
+.fine{font-size:12.5px;color:var(--muted);margin:10px 0 0}
+.done .tick{width:46px;height:46px;border-radius:50%;border:1.5px solid var(--amber);display:grid;place-items:center;margin-bottom:16px}
+.done .tick svg{width:22px;height:22px}
+.wrap{margin:20px 0;border:1px solid var(--amber);border-radius:16px;padding:16px;background:rgba(217,164,65,.09);font-family:var(--serif);font-size:24px;line-height:1.2;text-align:center}
+.wrap small{display:block;font-family:var(--sans);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);margin:0 0 6px;font-weight:600}
+.pbanner{font-size:12.5px;color:var(--err);border:1px dashed var(--err);border-radius:10px;padding:8px 12px;margin:0 0 16px}
+footer.foot{padding:18px 0 22px;text-align:center;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);margin-top:6px}
+footer.foot span{color:var(--text)}
+@media (max-width:360px){h1{font-size:40px}.fh h2{font-size:27px}.price .amt{font-size:44px}}
+@media (prefers-reduced-motion:reduce){*{animation:none!important;transition:none!important}}
+</style>
+</head>
+<body>
+<div class="app">
+  <header class="top">
+    <div class="brand">
+      <svg viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="1.4" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/><path d="M12 4.2l2.1 7.8L12 19.8 9.9 12z" fill="rgba(217,164,65,.25)"/><circle cx="12" cy="12" r="1.1" fill="#D9A441" stroke="none"/></svg>
+      RealtorOne
+    </div>
+    <div class="tag">Content Sprint</div>
+  </header>
+
+  <main id="main">
+    <!-- 1. PITCH -->
+    <section class="screen active" id="s-pitch" tabindex="-1" aria-labelledby="p-h">
+      <p class="eyebrow">RealtorOne Content Sprint</p>
+      <h1 id="p-h">Never wonder what to post <span class="amber">again.</span></h1>
+      <p class="lede">Every morning at 9 AM Dubai time, receive ready-to-post content built around your market, your specialization and your personal brand.</p>
+      <p class="lede" style="margin-top:10px;color:var(--text)">30 days. 150 pieces of content. One less thing to worry about.</p>
+
+      <div class="price" id="priceBox">
+        <span class="badge">Founding offer</span>
+        <div class="row"><span class="amt" id="priceAmt">AED 400</span><span class="per">/ 30 days</span></div>
+        <p class="reg" id="regLine" hidden></p>
+        <p class="fine" id="spotsLine">Only 10 founding spots from this Live Lab. Each realtor’s content is personalised around their market, specialization and personal brand.</p>
+      </div>
+      <ul class="quick" aria-label="Highlights">
+        <li>9 AM Dubai time, daily</li><li>Captions included</li><li>No content planning</li>
+      </ul>
+
+      <div class="sec">
+        <p class="eyebrow">The daily problem</p>
+        <h2>“What should I post today?”</h2>
+        <p class="sub">Every morning, the same questions start from zero:</p>
+        <ul class="qlist">
+          <li>What should I post?</li>
+          <li>Should I make a Reel or a carousel?</li>
+          <li>What topic is relevant?</li>
+          <li>How do I write the caption?</li>
+          <li>What is happening in Dubai real estate?</li>
+          <li>Is this relevant to my niche?</li>
+          <li>How do I make it look professional?</li>
+        </ul>
+        <p style="margin-top:16px">That’s content friction. The Content Sprint removes it:</p>
+        <ol class="crumbs" aria-label="How it works">
+          <li>Market intelligence</li><li>Content creation</li><li>Personalization</li><li>Delivery</li><li>You post</li>
+        </ol>
+        <div class="promise"><p>You focus on selling.</p><p class="amber">We keep your personal brand active.</p></div>
+      </div>
+
+      <div class="sec">
+        <p class="eyebrow">A RealtorOne content day</p>
+        <h2>What your morning looks like</h2>
+        <ul class="timeline">
+          <li><div class="when">9:00 AM · Dubai</div><div class="what">Your content for the day lands, ready to post.</div></li>
+          <li><div class="what">Post 1 <span class="kind">Static</span></div><div class="sub" style="margin:0;font-size:14px;color:var(--muted)">Market insight</div></li>
+          <li><div class="what">Post 2 <span class="kind">Static</span></div><div class="sub" style="margin:0;font-size:14px;color:var(--muted)">Personal-brand authority</div></li>
+          <li><div class="what">Carousel 1 <span class="kind">Carousel</span></div><div class="sub" style="margin:0;font-size:14px;color:var(--muted)">Educational topic</div></li>
+          <li><div class="what">Carousel 2 <span class="kind">Carousel</span></div><div class="sub" style="margin:0;font-size:14px;color:var(--muted)">Community insight</div></li>
+          <li><div class="what">Carousel 3 <span class="kind">Carousel</span></div><div class="sub" style="margin:0;font-size:14px;color:var(--muted)">Buyer / seller psychology</div></li>
+        </ul>
+        <p class="sub" style="margin-top:2px">Captions included with every post.</p>
+        <h3 style="font-size:22px;margin:22px 0 4px">What you get</h3>
+        <ul class="checks">
+          <li>2 static posts a day</li>
+          <li>3 carousel posts a day</li>
+          <li>Captions included</li>
+          <li>Dubai real-estate topics and current market trends</li>
+          <li>Content relevant to your specialization</li>
+          <li>Ready-to-post creative</li>
+          <li>No content planning required</li>
+        </ul>
+        <div class="tiles" aria-label="The maths">
+          <div class="tile"><b>5</b><span>posts a day</span></div>
+          <div class="tile"><b>30</b><span>days</span></div>
+          <div class="tile wide"><b>150 pieces of content</b><span>60 static posts + 90 carousels. The proof of the work, not the point of it.</span></div>
+        </div>
+        <p class="quote">You don’t know which post will start the conversation that becomes your next client.</p>
+        <p class="disc">Content keeps you visible. It does not guarantee leads or deals.</p>
+      </div>
+
+      <div class="sec">
+        <p class="eyebrow">Founding spots</p>
+        <h2 id="spotsH">We are opening 10 Content Sprint spots for today’s Live Lab attendees.</h2>
+        <p style="margin-top:12px">If you want to stop worrying about what to post every morning, complete the short onboarding form.</p>
+        <p>We’ll understand your market, specialization and personal brand first. Then we’ll show you exactly what your content will look like.</p>
+        <p>If you like it, secure your spot for <b id="priceInline">AED 400</b>.</p>
+        <ol class="steps">
+          <li><b>Claim your spot.</b> Name, email, WhatsApp.</li>
+          <li><b>Tell us about your business.</b> A 5–10 minute questionnaire.</li>
+          <li><b>See your content examples.</b> Samples built around your answers.</li>
+          <li><b>Secure your spot.</b> Pay and your 30 days begin.</li>
+        </ol>
+      </div>
+
+      <div class="sticky"><button class="btn" id="claimBtn" type="button">Claim your spot</button></div>
+    </section>
+
+    <!-- 2. CLAIM -->
+    <section class="screen" id="s-claim" tabindex="-1" aria-labelledby="c-h">
+      <div class="qhead">
+        <button class="back" data-go="pitch" type="button"><span aria-hidden="true">←</span> Back</button>
+        <div class="count">Step <b>1</b> of 4</div>
+      </div>
+      <ol class="stepper" aria-hidden="true"><li class="cur">Claim</li><li>Your business</li><li>Examples</li><li>Secure</li></ol>
+      <div class="fh"><h2 id="c-h">Claim your spot</h2></div>
+      <p class="fsub">Three details first. Then a short questionnaire about your business.</p>
+      <form id="claimForm" novalidate>
+        <label class="f" for="fName">Your name</label>
+        <input class="inp" id="fName" type="text" autocomplete="name" placeholder="Name" required>
+        <label class="f" for="fEmail">Email</label>
+        <input class="inp" id="fEmail" type="email" inputmode="email" autocomplete="email" placeholder="you@example.com">
+        <label class="f" for="fWa">WhatsApp number</label>
+        <input class="inp" id="fWa" type="tel" inputmode="tel" autocomplete="tel" placeholder="+971 50 123 4567">
+        <p class="hint">Include the country code. 🔒 Used only for your Content Sprint. No spam.</p>
+        <div class="hp" aria-hidden="true"><label>Leave empty <input id="fHp" type="text" tabindex="-1" autocomplete="off"></label></div>
+        <label class="consent"><input type="checkbox" id="fConsent"><span>I agree to be contacted on email and WhatsApp about my Content Sprint.</span></label>
+        <div class="err" id="claimErr" role="alert"></div>
+        <button class="btn" type="submit">Continue</button>
+      </form>
+    </section>
+
+    <!-- 3. QUESTIONNAIRE -->
+    <section class="screen" id="s-q" tabindex="-1" aria-labelledby="q-h">
+      <div class="qhead">
+        <button class="back" id="qBack" type="button"><span aria-hidden="true">←</span> Back</button>
+        <div class="count" id="qCount" aria-live="polite"></div>
+      </div>
+      <ol class="stepper" aria-hidden="true"><li class="done">Claim</li><li class="cur">Your business</li><li>Examples</li><li>Secure</li></ol>
+      <div class="bar" role="progressbar" aria-label="Questionnaire progress" aria-valuemin="0" aria-valuemax="5" aria-valuenow="1" id="bar" style="margin-top:12px"><i id="barFill"></i></div>
+
+      <div class="pane" data-pane="0">
+        <div class="fh"><h2 id="q-h">Your business</h2></div>
+        <p class="fsub">So your content sounds like you, in your market.</p>
+        <label class="f" for="qIg">Your Instagram handle</label>
+        <input class="inp" id="qIg" type="text" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="@yourhandle">
+        <label class="f" for="qArea">Area(s) you specialise in</label>
+        <input class="inp" id="qArea" type="text" autocomplete="off" placeholder="e.g. Business Bay, JVC, Dubai Marina">
+        <label class="f" id="lPtype">Property type <i>(pick all that apply)</i></label>
+        <div class="chips" data-name="propertyTypes" data-mode="multi" role="group" aria-labelledby="lPtype">
+          <button type="button" class="chip" aria-pressed="false">Apartments</button>
+          <button type="button" class="chip" aria-pressed="false">Villas</button>
+          <button type="button" class="chip" aria-pressed="false">Townhouses</button>
+          <button type="button" class="chip" aria-pressed="false">Penthouses / luxury</button>
+          <button type="button" class="chip" aria-pressed="false">Commercial</button>
+          <button type="button" class="chip" aria-pressed="false">Land</button>
+        </div>
+        <div class="err" role="alert"></div>
+      </div>
+
+      <div class="pane" data-pane="1">
+        <div class="fh"><h2>Your deals</h2></div>
+        <p class="fsub">What you sell, and where.</p>
+        <label class="f" id="lDeal">Deal focus</label>
+        <div class="chips" data-name="dealFocus" data-mode="single" role="radiogroup" aria-labelledby="lDeal">
+          <button type="button" class="chip" role="radio" aria-checked="false">Off-plan</button>
+          <button type="button" class="chip" role="radio" aria-checked="false">Secondary</button>
+          <button type="button" class="chip" role="radio" aria-checked="false">Both</button>
+        </div>
+        <label class="f" for="qDev">Developers you work with <i>(optional)</i></label>
+        <input class="inp" id="qDev" type="text" autocomplete="off" placeholder="e.g. the developers you usually sell for">
+        <label class="f" for="qComm">Communities you focus on <i>(optional)</i></label>
+        <input class="inp" id="qComm" type="text" autocomplete="off" placeholder="e.g. Marina, JLT, Creek Harbour">
+        <div class="err" role="alert"></div>
+      </div>
+
+      <div class="pane" data-pane="2">
+        <div class="fh"><h2>Your clients</h2></div>
+        <p class="fsub">Who your content should speak to.</p>
+        <label class="f" id="lBuyer">Target buyer <i>(pick all that apply)</i></label>
+        <div class="chips" data-name="targetBuyer" data-mode="multi" role="group" aria-labelledby="lBuyer">
+          <button type="button" class="chip" aria-pressed="false">End-users</button>
+          <button type="button" class="chip" aria-pressed="false">Investors</button>
+          <button type="button" class="chip" aria-pressed="false">First-time buyers</button>
+          <button type="button" class="chip" aria-pressed="false">Luxury buyers</button>
+          <button type="button" class="chip" aria-pressed="false">International buyers</button>
+        </div>
+        <label class="f" id="lSeller">Target seller <i>(pick all that apply)</i></label>
+        <div class="chips" data-name="targetSeller" data-mode="multi" role="group" aria-labelledby="lSeller">
+          <button type="button" class="chip" aria-pressed="false">Owners upgrading</button>
+          <button type="button" class="chip" aria-pressed="false">Investor owners</button>
+          <button type="button" class="chip" aria-pressed="false">Landlords</button>
+          <button type="button" class="chip" aria-pressed="false">Off-plan resellers</button>
+          <button type="button" class="chip" aria-pressed="false">Not focused on sellers</button>
+        </div>
+        <div class="err" role="alert"></div>
+      </div>
+
+      <div class="pane" data-pane="3">
+        <div class="fh"><h2>You</h2></div>
+        <p class="fsub">Your experience and what you want your brand to do.</p>
+        <label class="f" for="qYears">Years of experience in real estate</label>
+        <select class="inp" id="qYears">
+          <option value="">Select</option><option>Less than 1 year</option><option>1–2 years</option><option>3–5 years</option><option>6–10 years</option><option>10+ years</option>
+        </select>
+        <label class="f" id="lLang">Languages you work in <i>(pick all that apply)</i></label>
+        <div class="chips" data-name="languages" data-mode="multi" role="group" aria-labelledby="lLang">
+          <button type="button" class="chip" aria-pressed="false">English</button>
+          <button type="button" class="chip" aria-pressed="false">Arabic</button>
+          <button type="button" class="chip" aria-pressed="false">Hindi</button>
+          <button type="button" class="chip" aria-pressed="false">Urdu</button>
+          <button type="button" class="chip" aria-pressed="false">Russian</button>
+          <button type="button" class="chip" aria-pressed="false">Chinese</button>
+          <button type="button" class="chip" aria-pressed="false">French</button>
+        </div>
+        <input class="inp" id="qLangOther" type="text" autocomplete="off" placeholder="Other language(s), optional" aria-label="Other languages">
+        <label class="f" id="lGoal">Personal brand goal <i>(pick up to 2)</i></label>
+        <div class="chips" data-name="goals" data-mode="multi" data-max="2" role="group" aria-labelledby="lGoal">
+          <button type="button" class="chip" aria-pressed="false">Get more enquiries</button>
+          <button type="button" class="chip" aria-pressed="false">Be known as the expert in my area</button>
+          <button type="button" class="chip" aria-pressed="false">Win more listings</button>
+          <button type="button" class="chip" aria-pressed="false">Attract investors</button>
+          <button type="button" class="chip" aria-pressed="false">Build trust with international buyers</button>
+          <button type="button" class="chip" aria-pressed="false">Stay consistent online</button>
+        </div>
+        <div class="err" role="alert"></div>
+      </div>
+
+      <div class="pane" data-pane="4">
+        <div class="fh"><h2>Where you are today</h2></div>
+        <p class="fsub">A baseline, and the style you like.</p>
+        <label class="f" for="qFreq">How often do you post right now?</label>
+        <select class="inp" id="qFreq">
+          <option value="">Select</option><option>Rarely or never</option><option>A few times a month</option><option>About once a week</option><option>Several times a week</option><option>Daily</option>
+        </select>
+        <label class="f">3 accounts you admire or compete with <i>(at least 1)</i></label>
+        <input class="inp" id="qC1" type="text" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="@account one" aria-label="Account 1">
+        <input class="inp" id="qC2" type="text" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="@account two (optional)" aria-label="Account 2">
+        <input class="inp" id="qC3" type="text" autocapitalize="none" autocorrect="off" spellcheck="false" placeholder="@account three (optional)" aria-label="Account 3">
+        <label class="f" id="lDel">Where should we send your daily content?</label>
+        <div class="chips" data-name="delivery" data-mode="single" role="radiogroup" aria-labelledby="lDel">
+          <button type="button" class="chip" role="radio" aria-checked="false">WhatsApp</button>
+          <button type="button" class="chip" role="radio" aria-checked="false">Email</button>
+          <button type="button" class="chip" role="radio" aria-checked="false">Both</button>
+        </div>
+        <div class="err" role="alert"></div>
+      </div>
+
+      <div class="navrow" style="margin-top:14px">
+        <button class="btn" id="qNext" type="button">Next</button>
+      </div>
+    </section>
+
+    <!-- 4. EXAMPLES -->
+    <section class="screen" id="s-ex" tabindex="-1" aria-labelledby="e-h">
+      <div class="qhead">
+        <button class="back" data-go="q-last" type="button"><span aria-hidden="true">←</span> Edit answers</button>
+        <div class="count">Step <b>3</b> of 4</div>
+      </div>
+      <ol class="stepper" aria-hidden="true"><li class="done">Claim</li><li class="done">Your business</li><li class="cur">Examples</li><li>Secure</li></ol>
+      <div class="fh"><h2 id="e-h">See your content examples</h2></div>
+      <p class="fsub" id="exSub"></p>
+      <div class="disclaimer"><b>Samples only.</b> These are examples built from your answers, not your final posts. Anything in <span class="ph">[brackets]</span> is filled with current, checked data when we write your real content. We never make up numbers.</div>
+      <div id="samples"></div>
+      <p class="sub" style="color:var(--muted);font-size:15px;margin:0 0 16px">Like what you see? Secure your spot and your 30 days begin.</p>
+      <button class="btn" id="toPay" type="button">Secure my spot</button>
+    </section>
+
+    <!-- 5. PAYMENT -->
+    <section class="screen" id="s-pay" tabindex="-1" aria-labelledby="pay-h">
+      <div class="qhead">
+        <button class="back" data-go="ex" type="button"><span aria-hidden="true">←</span> Back</button>
+        <div class="count">Step <b>4</b> of 4</div>
+      </div>
+      <ol class="stepper" aria-hidden="true"><li class="done">Claim</li><li class="done">Your business</li><li class="done">Examples</li><li class="cur">Secure</li></ol>
+      <div class="fh"><h2 id="pay-h">Secure your spot</h2></div>
+      <p class="fsub" id="paySub">One of 10 founding Content Sprint spots.</p>
+      <div class="paycard">
+        <span class="badge">Founding offer</span>
+        <div><span class="amt" id="payAmt">AED 400</span><span class="per">/ 30 days</span></div>
+        <p class="reg" id="payReg" hidden style="margin:6px 0 0;font-size:13.5px;color:var(--muted)"></p>
+        <ul class="checks">
+          <li>Ready-to-post content every morning, 9 AM Dubai time</li>
+          <li>2 static + 3 carousels a day, captions included</li>
+          <li>Built around your market and personal brand</li>
+          <li>30 days · 150 pieces of content</li>
+        </ul>
+        <div class="preview-box" id="payPreview" hidden><b>Preview:</b> the payment link isn’t set yet. In the live version this button opens secure checkout.</div>
+        <a class="btn" id="payBtn" href="#" target="_blank" rel="noopener">Pay AED 400 and secure my spot</a>
+        <button class="btn" id="payPreviewBtn" type="button" hidden>Pay AED 400 (preview only)</button>
+        <p class="fine">After you pay, you’ll get a payment receipt from the payment provider. We confirm your spot on your chosen channel once we see your payment.</p>
+      </div>
+      <div id="paidRow" style="margin-top:18px" hidden>
+        <p class="sub" style="color:var(--muted);font-size:14.5px;margin:0 0 10px">Finished paying in the other tab?</p>
+        <button class="btn ghost" id="paidBtn" type="button">I’ve completed my payment</button>
+      </div>
+      <p class="note"><a class="link" id="payWa" href="#" target="_blank" rel="noopener" hidden>Questions? Message us on WhatsApp</a></p>
+    </section>
+
+    <!-- 6. WELCOME -->
+    <section class="screen" id="s-welcome" tabindex="-1" aria-labelledby="w-h">
+      <div class="done" style="display:block">
+        <div class="tick" aria-hidden="true"><svg viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></div>
+        <p class="pbanner" id="wPreview" hidden>Preview mode: no payment was taken and nothing was sent.</p>
+        <p class="eyebrow" id="wName">Welcome</p>
+        <h2 id="w-h">Welcome to the RealtorOne Content Sprint</h2>
+        <p class="lede" style="margin-top:12px">Your content starts at the next 9:00 AM Dubai time, once we’ve confirmed your payment. Then every morning for 30 days.</p>
+        <ol class="steps" style="margin-top:20px">
+          <li><b>We confirm your payment</b> and message you on <span id="wChan">your chosen channel</span>.</li>
+          <li><b>Next 9 AM, Dubai time:</b> your first day of ready-to-post content arrives.</li>
+          <li><b>30 days:</b> 2 static posts and 3 carousels every morning, captions included.</li>
+        </ol>
+        <div class="wrap"><small>At the end of your 30 days</small>30 days × 5 posts/day = 150 opportunities to be seen.</div>
+        <p class="quote" style="font-size:21px;margin:0 0 20px">You don’t know which post will start the conversation that becomes your next client.</p>
+        <a class="btn" id="waBtn" href="#" target="_blank" rel="noopener" hidden>Message us on WhatsApp</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot"><span>RealtorOne Content Sprint</span> · A RealtorOne project</footer>
+</div>
+
+<noscript><p style="max-width:480px;margin:0 auto;padding:0 22px;color:#F0A08A">This page needs JavaScript to show the form.</p></noscript>
+<script>
+(function(){
+"use strict";
+/* ===== CONFIG ===== */
+var SUBMIT_ENDPOINT = "";   // Google Apps Script web app URL (ends in /exec). Empty = save to localStorage only (preview mode).
+var PAYMENT_URL     = "";   // Razorpay Payment Link for AED 400. Empty = clearly marked preview, no real payment.
+var WHATSAPP_NUMBER = "917302317285";   // digits with country code. Empty = WhatsApp buttons hidden
+var CURRENCY        = "AED";
+var PRICE           = 400;  // founding price for 30 days
+var REGULAR_PRICE   = "";   // optional, e.g. "590–690". Owner must confirm first. Empty = hidden
+var SPOTS           = 10;   // founding spots, mentioned in the pitch text
+/* ================== */
+
+var $ = function(id){return document.getElementById(id)};
+var screens = {pitch:$("s-pitch"),claim:$("s-claim"),q:$("s-q"),ex:$("s-ex"),pay:$("s-pay"),welcome:$("s-welcome")};
+var NPANES = 5, pane = 0, curScreen = "pitch";
+var lead = {}, signup = null, paidSent = false;
+var LS = "contentSprint.";
+
+function lsGet(k){ try{ return localStorage.getItem(LS+k); }catch(_){ return null; } }
+function lsSet(k,v){ try{ localStorage.setItem(LS+k,v); }catch(_){} }
+function esc(s){ return String(s==null?"":s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;").replace(/'/g,"&#39;"); }
+function money(n){ return CURRENCY+" "+n; }
+
+/* ---------- config -> page ---------- */
+(function applyConfig(){
+  $("priceAmt").textContent = money(PRICE); $("payAmt").textContent = money(PRICE); $("priceInline").textContent = money(PRICE);
+  $("payBtn").textContent = "Pay "+money(PRICE)+" and secure my spot";
+  $("payPreviewBtn").textContent = "Pay "+money(PRICE)+" (preview only)";
+  $("spotsLine").textContent = "Only "+SPOTS+" founding spots from this Live Lab. Each realtor’s content is personalised around their market, specialization and personal brand.";
+  $("spotsH").textContent = "We are opening "+SPOTS+" Content Sprint spots for today’s Live Lab attendees.";
+  if(REGULAR_PRICE){
+    ["regLine","payReg"].forEach(function(id){ var e=$(id); e.hidden=false; e.innerHTML = "Regular price later: <s>"+esc(CURRENCY+" "+REGULAR_PRICE)+"</s>"; });
+  }
+})();
+
+/* ---------- navigation ---------- */
+function show(name, back, noPush){
+  Object.keys(screens).forEach(function(k){ screens[k].classList.remove("active","back"); });
+  var el = screens[name];
+  if(back) el.classList.add("back");
+  el.classList.add("active");
+  curScreen = name;
+  window.scrollTo(0,0);
+  el.focus({preventScroll:true});
+  if(!noPush){ try{ history.pushState({s:name,p:pane},"",location.href); }catch(_){} }
+}
+window.addEventListener("popstate", function(e){
+  var s = e.state && e.state.s;
+  if(!s || !screens[s]) { show("pitch", true, true); return; }
+  if((s==="ex"||s==="pay") && !signup){ show("pitch", true, true); return; }
+  if(s==="q"){ setPane(e.state.p||0, true); }
+  show(s, true, true);
+});
+try{ history.replaceState({s:"pitch",p:0},"",location.href); }catch(_){}
+
+[].forEach.call(document.querySelectorAll("[data-go]"), function(b){
+  b.addEventListener("click", function(){
+    var g = b.getAttribute("data-go");
+    if(g==="q-last"){ setPane(NPANES-1,true); show("q",true); } else show(g,true);
+  });
+});
+$("claimBtn").addEventListener("click", function(){ show("claim"); });
+
+/* ---------- validation helpers ---------- */
+function waOK(v){ var d=v.replace(/[\s\-().]/g,""); return /^\+?\d{7,15}$/.test(d); }
+function emailOK(v){ return /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(v); }
+function cleanHandle(v){
+  return String(v||"").trim().replace(/^https?:\/\/(www\.)?instagram\.com\//i,"").replace(/^@+/,"").replace(/[\/?#].*$/,"").trim();
+}
+function handleOK(h){ return /^[A-Za-z0-9._]{1,30}$/.test(h); }
+function mark(el,bad){ if(el) el.classList.toggle("bad",!!bad); }
+
+document.addEventListener('input',function(e){ if(e.target&&e.target.classList) e.target.classList.remove('bad'); });
+document.addEventListener('change',function(e){ if(e.target&&e.target.classList) e.target.classList.remove('bad'); });
+
+/* ---------- step 1: claim ---------- */
+$("claimForm").addEventListener("submit", function(e){
+  e.preventDefault();
+  var err = $("claimErr"); err.textContent = "";
+  [].forEach.call($("claimForm").querySelectorAll(".inp"), function(x){x.classList.remove("bad")});
+  if($("fHp").value) return;
+  var name=$("fName").value.trim(), em=$("fEmail").value.trim(), wa=$("fWa").value.trim();
+  function bad(msg, el){ err.textContent=msg; if(el){ mark(el,true); el.focus(); } }
+  if(!name) return bad("Please add your name.", $("fName"));
+  if(!em) return bad("Please add your email.", $("fEmail"));
+  if(!emailOK(em)) return bad("That email doesn’t look right.", $("fEmail"));
+  if(!wa) return bad("Please add your WhatsApp number.", $("fWa"));
+  if(!waOK(wa)) return bad("That WhatsApp number doesn’t look right. Include the country code, for example +971.", $("fWa"));
+  if(!$("fConsent").checked) return bad("Please tick the box so we can contact you about your Content Sprint.", $("fConsent"));
+  lead = {name:name, email:em, whatsapp:wa};
+  setPane(0,false); show("q");
+});
+
+/* ---------- step 2: questionnaire ---------- */
+var chipGroups = [].slice.call(document.querySelectorAll(".chips"));
+chipGroups.forEach(function(g){
+  var single = g.getAttribute("data-mode")==="single", max = parseInt(g.getAttribute("data-max")||"0",10);
+  g.addEventListener("click", function(e){
+    var b = e.target.closest(".chip"); if(!b || !g.contains(b)) return;
+    var attr = single ? "aria-checked" : "aria-pressed";
+    var on = b.getAttribute(attr)==="true";
+    if(single){
+      [].forEach.call(g.querySelectorAll(".chip"), function(c){ c.setAttribute("aria-checked","false"); });
+      b.setAttribute("aria-checked","true");
+    } else if(!on && max && g.querySelectorAll('.chip[aria-pressed="true"]').length>=max){
+      var err = g.closest(".pane").querySelector(".err"); err.textContent = "Pick up to "+max+".";
+      return;
+    } else { b.setAttribute("aria-pressed", on?"false":"true"); }
+    g.classList.remove("bad");
+    var er = g.closest(".pane").querySelector(".err"); er.textContent = "";
+  });
+});
+function chips(name){
+  var g = document.querySelector('.chips[data-name="'+name+'"]');
+  return [].map.call(g.querySelectorAll('.chip[aria-pressed="true"],.chip[aria-checked="true"]'), function(b){return b.textContent.trim()});
+}
+function chipEl(name){ return document.querySelector('.chips[data-name="'+name+'"]'); }
+
+function setPane(i, back){
+  pane = i;
+  [].forEach.call(document.querySelectorAll(".pane"), function(p){ p.classList.toggle("active", +p.getAttribute("data-pane")===i); });
+  $("qCount").innerHTML = "Step <b>2</b> of 4 · "+(i+1)+"/"+NPANES;
+  $("qCount").setAttribute("aria-label","Step 2 of 4, questions part "+(i+1)+" of "+NPANES);
+  $("barFill").style.width = ((i+1)/NPANES*100)+"%";
+  $("bar").setAttribute("aria-valuenow", i+1);
+  $("qNext").textContent = i===NPANES-1 ? "See my content examples" : "Next";
+  window.scrollTo(0,0);
+}
+
+function validatePane(i){
+  var p = document.querySelector('.pane[data-pane="'+i+'"]'), err = p.querySelector(".err");
+  err.textContent = "";
+  [].forEach.call(p.querySelectorAll(".inp"), function(x){x.classList.remove("bad")});
+  [].forEach.call(p.querySelectorAll(".chips"), function(x){x.classList.remove("bad")});
+  function bad(msg, el){ err.textContent = msg; if(el){ mark(el,true); if(el.focus && !el.classList.contains("chips")) el.focus(); else { var c=el.querySelector(".chip"); if(c) c.focus(); } } return false; }
+  if(i===0){
+    var ig = cleanHandle($("qIg").value);
+    if(!ig) return bad("Please add your Instagram handle.", $("qIg"));
+    if(!handleOK(ig)) return bad("That Instagram handle doesn’t look right. Use letters, numbers, dots and underscores only.", $("qIg"));
+    if($("qArea").value.trim().length<2) return bad("Please tell us the area(s) you specialise in.", $("qArea"));
+    if(!chips("propertyTypes").length) return bad("Please pick at least one property type.", chipEl("propertyTypes"));
+  }
+  if(i===1){
+    if(!chips("dealFocus").length) return bad("Please choose off-plan, secondary or both.", chipEl("dealFocus"));
+  }
+  if(i===2){
+    if(!chips("targetBuyer").length) return bad("Please pick at least one target buyer.", chipEl("targetBuyer"));
+    if(!chips("targetSeller").length) return bad("Please pick at least one target seller, or “Not focused on sellers”.", chipEl("targetSeller"));
+  }
+  if(i===3){
+    if(!$("qYears").value) return bad("Please select your years of experience.", $("qYears"));
+    if(!chips("languages").length && !$("qLangOther").value.trim()) return bad("Please pick at least one language.", chipEl("languages"));
+    if(!chips("goals").length) return bad("Please pick at least one personal brand goal.", chipEl("goals"));
+  }
+  if(i===4){
+    if(!$("qFreq").value) return bad("Please tell us how often you post right now.", $("qFreq"));
+    var any = false, bads = null;
+    ["qC1","qC2","qC3"].forEach(function(id){
+      var h = cleanHandle($(id).value);
+      if(h){ any = true; if(!handleOK(h) && !bads) bads = $(id); }
+    });
+    if(!any) return bad("Please add at least one account you admire or compete with.", $("qC1"));
+    if(bads) return bad("That account doesn’t look right. Use a handle like @name.", bads);
+    if(!chips("delivery").length) return bad("Please choose where to send your daily content.", chipEl("delivery"));
+  }
+  return true;
+}
+
+$("qNext").addEventListener("click", function(){
+  if(!validatePane(pane)) return;
+  if(pane < NPANES-1){ setPane(pane+1,false); try{ history.pushState({s:"q",p:pane},"",location.href); }catch(_){} return; }
+  finishQuestionnaire();
+});
+$("qBack").addEventListener("click", function(){
+  if(pane>0){ setPane(pane-1,true); } else { show("claim",true); }
+});
+
+function newId(){ return "CS-"+Date.now().toString(36).toUpperCase()+Math.random().toString(36).slice(2,6).toUpperCase(); }
+
+function finishQuestionnaire(){
+  var c = [$("qC1"),$("qC2"),$("qC3")].map(function(e){return cleanHandle(e.value)}).filter(Boolean);
+  var langs = chips("languages"); var lo = $("qLangOther").value.trim();
+  if(lo) langs.push(lo);
+  signup = {
+    event:"signup", id: signup && signup.id || newId(), ts:new Date().toISOString(),
+    name:lead.name, email:lead.email, whatsapp:lead.whatsapp, consent:true,
+    instagram:cleanHandle($("qIg").value), areas:$("qArea").value.trim(),
+    propertyTypes:chips("propertyTypes"), dealFocus:chips("dealFocus")[0],
+    developers:$("qDev").value.trim(), communities:$("qComm").value.trim(),
+    targetBuyer:chips("targetBuyer"), targetSeller:chips("targetSeller"),
+    years:$("qYears").value, languages:langs, goals:chips("goals"),
+    postingFrequency:$("qFreq").value, inspiration:c, delivery:chips("delivery")[0],
+    price:money(PRICE), preview:!SUBMIT_ENDPOINT
+  };
+  lsSet("lastId", signup.id); lsSet("lastName", signup.name); lsSet("lastDelivery", signup.delivery);
+  var btn = $("qNext"); btn.disabled = true; btn.textContent = "Saving…";
+  submit(signup).then(function(){
+    btn.disabled = false;
+    renderExamples(); show("ex");
+  }).catch(function(){
+    btn.disabled = false; btn.textContent = "See my content examples";
+    var er = document.querySelector('.pane[data-pane="'+(NPANES-1)+'"] .err');
+    er.textContent = "Something went wrong saving that. Please check your connection and try again.";
+  });
+}
+
+function submit(payload){
+  try{
+    var k=LS+"responses", a=JSON.parse(localStorage.getItem(k)||"[]"); a.push(payload); localStorage.setItem(k, JSON.stringify(a));
+  }catch(_){}
+  if(!SUBMIT_ENDPOINT) return Promise.resolve();
+  return fetch(SUBMIT_ENDPOINT, { method:"POST", mode:"no-cors", headers:{"Content-Type":"text/plain;charset=utf-8"}, body: JSON.stringify(payload) });
+}
+
+/* ---------- step 3: examples (adapt to answers; placeholders, never invented data) ---------- */
+function ph(t){ return "[" + t + "]"; }
+function listJoin(a){ a = a.filter(Boolean); if(a.length<2) return a.join(""); return a.slice(0,-1).join(", ")+" and "+a[a.length-1]; }
+function lower(a){ return a.map(function(s){return s.toLowerCase()}); }
+function firstItem(s){ return String(s||"").split(/,|&|\/|;| and /i)[0].trim(); }
+function hashTag(s){ return "#"+String(s).replace(/[^A-Za-z0-9]/g,""); }
+
+function buildSamples(d){
+  var first = d.name.split(/\s+/)[0];
+  var area = firstItem(d.areas) || "your area";
+  var comm = firstItem(d.communities) || area;
+  var types = lower(d.propertyTypes); var typePhrase = types.length ? listJoin(types) : "property";
+  var typeShort = types.length===1 ? types[0] : "property";
+  var buyers = lower(d.targetBuyer); var buyerPhrase = buyers.length ? listJoin(buyers) : "buyers";
+  var offplan = d.dealFocus==="Off-plan" || d.dealFocus==="Both";
+  var wantsSellers = d.goals.indexOf("Win more listings")>-1;
+  var devs = d.developers ? listJoin(d.developers.split(/,|;/).map(function(x){return x.trim()}).filter(Boolean)) : "";
+  var yearsLine = (d.years && d.years!=="Less than 1 year") ? d.years+" in Dubai real estate" : "";
+  var langLine = d.languages.length ? "I work in "+listJoin(d.languages)+"." : "";
+  var S = [];
+
+  S.push({slot:"Post 1", kind:"Static", label:"Market insight",
+    slides:[{k:"Market insight · "+area, h:area+": this week in one look", b:ph("Latest figure + source")+"\n"+ph("Second figure + source")}],
+    caption:"A quick read on "+area+" this week 👇\n\n📊 "+ph("Latest figure + source")+"\n📊 "+ph("Second figure + source")+"\n\nWhat it may mean for "+buyerPhrase+": "+ph("one-line takeaway in plain English")+".\n\nThinking about "+typePhrase+" in "+area+"? Message me and I’ll walk you through what fits you.\n\n— "+first+"\n"+hashTag(area)+" #DubaiRealEstate"});
+
+  S.push({slot:"Post 2", kind:"Static", label:"Personal-brand authority",
+    slides:[{k:"Personal brand · "+first, h:"I don’t send you twenty listings. I help you choose the right one.", b:[yearsLine, area+" · "+typePhrase].filter(Boolean).join("\n")}],
+    caption:"My approach in "+area+" is simple: listen first, shortlist second.\n\nIf you’re looking at "+typePhrase+", I’d rather ask a few good questions than send a long list.\n\n"+[yearsLine?yearsLine+".":"", langLine].filter(Boolean).join(" ")+"\n\nWant a shortlist built around you? Send me a message.\n\n— "+first+" (@"+d.instagram+")"});
+
+  var q2 = offplan
+    ? {h:"2. Who is the developer, and what is the handover timeline?", b:"Ask for the payment plan, the timeline and where the project stands."+(devs?"\n"+ph("Add your "+devs+" project details"):"")}
+    : {h:"2. What is the property’s current status?", b:"Is it vacant or tenanted? Ask which documents are needed to transfer it."};
+  S.push({slot:"Carousel 1", kind:"Carousel", label:"Educational",
+    slides:[
+      {k:"Educational", h:"4 questions to ask before buying "+typeShort+" in "+area, b:"Swipe →"},
+      {k:"Question 1", h:"1. What is the total cost, not just the price?", b:"Ask about service charges, fees and any other costs. "+ph("Latest figure + source")},
+      {k:"Question 2", h:q2.h, b:q2.b},
+      {k:"Question 3", h:"3. Is it for living in or for investing?", b:"Your goal changes which "+typePhrase+" make sense in "+area+"."},
+      {k:"Question 4", h:"4. What is daily life like there?", b:"Visit at different times of day. Talk to people who live there."},
+      {k:"Next step", h:"Want a shortlist for "+area+"?", b:"Message "+first+"."}
+    ],
+    caption:"4 questions to ask before buying "+typeShort+" in "+area+" 👇\n\nSave this for your next viewing. Not sure where to start? Send me a message, I’ll help you work through them.\n\n— "+first+"\n"+hashTag(area)+" #DubaiProperty"});
+
+  S.push({slot:"Carousel 2", kind:"Carousel", label:"Community insight",
+    slides:[
+      {k:"Community insight", h:"Inside "+comm, b:"A local view from "+first},
+      {k:"The lifestyle", h:"What daily life feels like", b:ph("Your photo + one line on daily life")},
+      {k:"What’s available", h:"The "+typePhrase+" you’ll see here", b:ph("Options from your current inventory")},
+      {k:"Who it tends to suit", h:"Who it may suit", b:"For "+buyerPhrase+": "+ph("why it fits them, in your words")},
+      {k:"Next step", h:"Thinking about "+comm+"?", b:"Message "+first+" for a walkthrough."}
+    ],
+    caption:"A local look at "+comm+" 📍\n\nSwipe through what daily life looks like, what’s on offer and who it may suit.\n\nWant the details for your situation? Send me a message.\n\n— "+first+"\n"+hashTag(comm)+" #DubaiCommunities"});
+
+  var seller = wantsSellers;
+  S.push(seller ? {slot:"Carousel 3", kind:"Carousel", label:"Seller psychology",
+    slides:[
+      {k:"Seller psychology", h:"Thinking of selling in "+area+"? Why do so many owners wait?", b:"Swipe →"},
+      {k:"Often", h:"It can be about price expectations", b:"What an owner hopes for and what buyers are comparing can differ."},
+      {k:"Often", h:"Or about timing and the unknown", b:"Not knowing the steps can feel bigger than it is."},
+      {k:"What helps", h:"Clarity and a plan", b:"A clear view of the process, and honest numbers. "+ph("Add your approach")},
+      {k:"Next step", h:"Curious what your home could do?", b:"Message "+first+" for a no-pressure conversation."}
+    ],
+    caption:"Thinking about selling in "+area+" but not sure when? 🏡\n\nOften the hesitation is about pricing expectations and the unknown, not just the market.\n\nIf that sounds familiar, message me. No pressure, just a clear picture.\n\n— "+first}
+  : {slot:"Carousel 3", kind:"Carousel", label:"Buyer psychology",
+    slides:[
+      {k:"Buyer psychology", h:"“I’ll wait.” What’s really behind it?", b:"Swipe →"},
+      {k:"Often", h:"It’s about uncertainty, not only price", b:"Buyers can feel unsure about timing, the process or the numbers."},
+      {k:"What helps", h:"Clarity", b:"Clear next steps. Plain-English numbers. No pressure."},
+      {k:"What I do", h:"I answer the question behind the question", b:ph("Add your approach for "+buyerPhrase)},
+      {k:"Share it", h:"Know someone who’s unsure?", b:"Send them this, or message "+first+"."}
+    ],
+    caption:"When a buyer says “I’ll wait”, what do they usually mean? 🤔\n\nOften it’s uncertainty, not only price. For "+buyerPhrase+" looking at "+area+", clarity tends to help most.\n\nIf you’re in that spot, message me and let’s talk it through.\n\n— "+first});
+  return S;
+}
+
+function captionHtml(c){ return esc(c).replace(/\[([^\]]+)\]/g,'<span class="ph">[$1]</span>'); }
+function slideBody(t){ return esc(t).replace(/\[([^\]]+)\]/g,'<span class="ph">[$1]</span>'); }
+
+function renderExamples(){
+  var d = signup, S = buildSamples(d), first = d.name.split(/\s+/)[0];
+  $("exSub").textContent = first+", here’s a taste of your 9 AM delivery for "+(firstItem(d.areas)||"your market")+".";
+  var out = "";
+  S.forEach(function(s,i){
+    var n = s.slides.length, one = n===1;
+    var slides = s.slides.map(function(sl,j){
+      return '<div class="slide'+(one?' one':'')+'"><div class="top"><span class="sk">'+esc(sl.k)+'</span><span class="sk" style="color:var(--muted)">'+(one?'':(j+1)+'/'+n)+'</span></div>'+
+        '<div><div class="sh">'+esc(sl.h)+'</div><div class="sb">'+slideBody(sl.b)+'</div></div>'+
+        '<div class="sn">SAMPLE · RealtorOne</div></div>';
+    }).join("");
+    out += '<article class="sample" aria-label="Sample '+(i+1)+' of '+S.length+'">'+
+      '<div class="meta"><span class="slot">'+esc(s.slot)+(s.kind==='Static'?' · Static post':'')+'</span><span class="stag">Sample '+(i+1)+' of '+S.length+'</span></div>'+
+      '<h3>'+esc(s.label)+'</h3>'+
+      '<div class="slides" tabindex="0" aria-label="'+esc(s.label)+' sample slides">'+slides+'</div>'+
+      '<div class="cap"><p class="ck">Caption (sample)</p><div class="ct">'+captionHtml(s.caption)+'</div></div></article>';
+  });
+  $("samples").innerHTML = out;
+}
+$("toPay").addEventListener("click", function(){ renderPay(); show("pay"); });
+
+/* ---------- step 4: payment ---------- */
+function waLink(text){
+  var d = String(WHATSAPP_NUMBER||"").replace(/\D/g,"");
+  return d ? "https://wa.me/"+d+"?text="+encodeURIComponent(text) : "";
+}
+function renderPay(){
+  var hasPay = !!PAYMENT_URL;
+  $("payBtn").hidden = !hasPay; $("payPreviewBtn").hidden = hasPay; $("payPreview").hidden = hasPay;
+  if(hasPay) $("payBtn").href = PAYMENT_URL;
+  var first = signup ? signup.name.split(/\s+/)[0] : "";
+  $("paySub").textContent = (first ? first+", this" : "This")+" is one of "+SPOTS+" founding Content Sprint spots.";
+  var l = waLink("Hi, I just filled in the RealtorOne Content Sprint form"+(signup?" (ref "+signup.id+")":"")+". I have a question.");
+  var a = $("payWa"); if(l){ a.href = l; a.hidden = false; } else a.hidden = true;
+  $("paidRow").hidden = !paidShown;
+}
+var paidShown = false;
+$("payBtn").addEventListener("click", function(){
+  paidShown = true; $("paidRow").hidden = false;
+  if(signup) submit({event:"payment_clicked", id:signup.id, ts:new Date().toISOString()}).catch(function(){});
+});
+$("payPreviewBtn").addEventListener("click", function(){ paidShown = true; $("paidRow").hidden = false; $("paidRow").scrollIntoView({block:"center"}); });
+$("paidBtn").addEventListener("click", function(){ claimPaid(true); });
+
+/* ---------- welcome ---------- */
+function claimPaid(sendEvent){
+  var id = signup ? signup.id : lsGet("lastId");
+  if(sendEvent && id && !paidSent){
+    paidSent = true;
+    submit({event:"paid_claimed", id:id, ts:new Date().toISOString(), preview:!PAYMENT_URL}).catch(function(){});
+  }
+  renderWelcome(); show("welcome");
+}
+function renderWelcome(){
+  var name = signup ? signup.name : lsGet("lastName");
+  var chan = signup ? signup.delivery : lsGet("lastDelivery");
+  var first = (name||"").split(/\s+/)[0];
+  $("wName").textContent = first ? "Welcome, "+first : "Welcome";
+  $("wChan").textContent = chan==="Both" ? "WhatsApp and email" : (chan || "your chosen channel");
+  $("wPreview").hidden = !!PAYMENT_URL;
+  var l = waLink("Hi, I've paid for the RealtorOne Content Sprint"+(name?" ("+name+")":"")+". Please confirm my spot.");
+  var b = $("waBtn"); if(l){ b.href = l; b.hidden = false; } else b.hidden = true;
+}
+
+/* return from the payment page: ?paid=1 */
+try{
+  var qs = new URLSearchParams(location.search);
+  if(qs.get("paid")==="1"){
+    var rid = lsGet("lastId");
+    if(rid && !lsGet("paidSent:"+rid)){ lsSet("paidSent:"+rid,"1"); paidSent = false; claimPaid(true); }
+    else { renderWelcome(); show("welcome",false,true); }
+    try{ history.replaceState({s:"welcome",p:0},"",location.pathname); }catch(_){}
+  }
+}catch(_){}
+
+setPane(0,false);
+})();
+</script>
+</body>
+</html>
