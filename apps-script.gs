@@ -34,17 +34,20 @@ var SPRINT_DAYS           = 30;    // days of content per person
 var REMINDER_AFTER_HOURS  = 24;    // send ONE payment reminder this long after signup
 var REMINDER_MAX_AGE_DAYS = 7;     // ...but never to signups older than this (stops old rows getting a late nudge)
 var QUOTA_RESERVE         = 10;    // keep this many MailApp sends free for confirmations / owner notices
-var SKIP_EMAIL_IF_WHATSAPP_ONLY = false;   // true = people who chose "WhatsApp" only are not emailed their daily content
+var SEND_CLAIM_NOTE       = true;  // short "we are confirming your payment" note when someone taps "I've completed my payment"
+var SEND_OWNER_DIGEST     = true;  // each morning, email YOU the WhatsApp queue (one email) when it has messages
+var SEND_PAYMENT_REMINDER = false; // OFF: the flow is exactly 3 customer messages (confirmation, welcome, daily). true = also ONE reminder 24h+ after signup
 /* ============================== */
 
 var SHEET_NAME = 'Responses';
 var CONTENT_TAB = 'Content Today';
+var WA_TAB = 'WhatsApp Queue';
 var HEADERS = ['Submission ID', 'Timestamp (UTC)', 'Name', 'Email', 'WhatsApp', 'Instagram',
                'Areas / specialization', 'Property types', 'Deal focus', 'Developers', 'Communities',
                'Target buyer', 'Target seller', 'Years of experience', 'Languages', 'Brand goals',
                'Posting frequency', 'Inspiration 1', 'Inspiration 2', 'Inspiration 3',
                'Delivery channel', 'Consent', 'Payment status', 'Payment updated (UTC)',
-               'Delivery status', 'Owner notified', 'Reminder sent', 'Content start date',
+               'Delivery status', 'Owner notified', 'Reminder sent', 'Welcome sent', 'Content start date',
                'Last content sent', 'Content days sent', 'Notes', 'Raw (JSON)'];
 /* Column positions are read from row 1 by NAME, so an older sheet keeps working:
    any header that is missing is added at the end the next time the script runs. */
@@ -161,6 +164,8 @@ function onSignup(sh, d, id) {
 }
 
 /* ---------- payment events ---------- */
+/* The page can only say "I paid" (PAID_CLAIMED). That sends a short "we are confirming" note.
+   The full welcome goes out when YOU set Payment status to PAID in the sheet (see sendPendingWelcomes). */
 function onPayment(sh, d, id, newStatus) {
   var r = findRow(sh, id);
   if (!r) {   // the signup row was not found: keep a trace anyway
@@ -168,7 +173,7 @@ function onPayment(sh, d, id, newStatus) {
                      'Payment status': 'PENDING', 'Notes': 'No signup row found for this ID' });
   }
   var cur = String(getCell(sh, r, 'Payment status'));
-  if (isPaid(cur)) { return { ok: true, status: cur, duplicate: true }; }   // never step backwards (or re-send the welcome)
+  if (isPaid(cur)) { return { ok: true, status: cur, duplicate: true }; }   // never step backwards (or repeat the note)
   setCell(sh, r, 'Payment status', newStatus);
   setCell(sh, r, 'Payment updated (UTC)', plain(d.ts, 40) || new Date().toISOString());
   if (d.preview === true) { setCell(sh, r, 'Notes', 'payment event from a preview page'); }
@@ -176,13 +181,15 @@ function onPayment(sh, d, id, newStatus) {
     var s = rowToSignup(sh, r);
     if (!s.name) { s.name = 'unknown (ID ' + id + ')'; }
     var test = isTestRow(s.name, s.email);
-    var ok = /^[^\s@,;<>"]+@[^\s@,;<>"]+\.[^\s@,;<>"]{2,}$/.test(s.email);
-    var st = test ? 'TEST_ROW_NO_EMAIL' : (ok ? sendWelcomeEmail(s) : 'EMAIL_NOT_SENT: invalid email');
-    setCell(sh, r, 'Delivery status', st);
-    if (!test) {
+    if (test) {
+      setCell(sh, r, 'Delivery status', 'TEST_ROW_NO_EMAIL');
+    } else {
+      if (SEND_CLAIM_NOTE) {
+        setCell(sh, r, 'Delivery status', validEmail(s.email) ? sendClaimNote(s) : 'EMAIL_NOT_SENT: invalid email');
+      }
       setCell(sh, r, 'Owner notified', sendOwnerEmail(
         'Content Sprint: payment claimed by ' + s.name,
-        s.name + ' says they have paid ' + CURRENCY + ' ' + PRICE + '.\n\nCheck Razorpay for the payment. If it is there, set Payment status to PAID in the sheet: the daily 9 AM content email then starts for them.\n\n' + ownerSummary(s)));
+        s.name + ' says they have paid ' + CURRENCY + ' ' + PRICE + '.\n\nCheck Razorpay for the payment. If it is there, set Payment status to PAID in the sheet: that sends their Welcome email, and the daily 9 AM content starts for them.\n\n' + ownerSummary(s)));
     }
   }
   return { ok: true, status: newStatus };
@@ -190,7 +197,7 @@ function onPayment(sh, d, id, newStatus) {
 
 function rowToSignup(sh, r) {
   var v = sh.getRange(r, 1, 1, NCOLS).getValues()[0];
-  function g(h) { return COL[h] ? String(v[COL[h] - 1] == null ? '' : v[COL[h] - 1]) : ''; }
+  function g(h) { return COL[h] ? String(v[COL[h] - 1] == null ? '' : v[COL[h] - 1]).replace(/^'(?=[=+\-@])/, '') : ''; }   // safe() may have added a leading ' to numbers like +971...
   return { id: g('Submission ID'), name: g('Name'), email: g('Email'), whatsapp: g('WhatsApp'),
            instagram: g('Instagram'), areas: g('Areas / specialization'), types: g('Property types'),
            deal: g('Deal focus'), devs: g('Developers'), comms: g('Communities'), buyers: g('Target buyer'),
@@ -204,24 +211,50 @@ function rowToSignup(sh, r) {
    AUTOMATION (run setupTriggers once; see SETUP.md)
    ==================================================================== */
 
-/* Run this ONCE from the editor. It (re)creates the two time-driven triggers and the "Content Today" tab. */
-function setupTriggers() {
+var AUTO_HANDLERS = ['sendReminders', 'hourlyTasks', 'sendDailyContent', 'onSheetEdit'];
+function clearAutoTriggers() {
   ScriptApp.getProjectTriggers().forEach(function (t) {
-    var f = t.getHandlerFunction();
-    if (f === 'sendReminders' || f === 'sendDailyContent') { ScriptApp.deleteTrigger(t); }
+    if (AUTO_HANDLERS.indexOf(t.getHandlerFunction()) >= 0) { ScriptApp.deleteTrigger(t); }
   });
-  ScriptApp.newTrigger('sendReminders').timeBased().everyHours(1).create();
-  ScriptApp.newTrigger('sendDailyContent').timeBased().atHour(DAILY_HOUR).everyDays(1).inTimezone(TZ).create();
-  getSheet();            // makes sure the new columns exist
-  getContentSheet();     // makes sure the "Content Today" tab exists
-  Logger.log('Triggers created: sendReminders (hourly) and sendDailyContent (daily, ' + DAILY_HOUR + ':00-' + (DAILY_HOUR + 1) + ':00 ' + TZ + ').');
 }
-function removeTriggers() {
-  ScriptApp.getProjectTriggers().forEach(function (t) {
-    var f = t.getHandlerFunction();
-    if (f === 'sendReminders' || f === 'sendDailyContent') { ScriptApp.deleteTrigger(t); }
-  });
-  Logger.log('Automation triggers removed.');
+
+/* Run this ONCE from the editor (and again after any change to DAILY_HOUR / TZ). It (re)creates:
+   - an hourly trigger (sends any pending Welcome emails, plus the optional reminder)
+   - a daily trigger at DAILY_HOUR Asia/Dubai (daily content: email + WhatsApp queue)
+   - an "on edit" trigger: setting Payment status to PAID sends the Welcome within seconds
+   and the "Content Today" and "WhatsApp Queue" tabs. */
+function setupTriggers() {
+  clearAutoTriggers();
+  ScriptApp.newTrigger('hourlyTasks').timeBased().everyHours(1).create();
+  ScriptApp.newTrigger('sendDailyContent').timeBased().atHour(DAILY_HOUR).everyDays(1).inTimezone(TZ).create();
+  ScriptApp.newTrigger('onSheetEdit').forSpreadsheet(SpreadsheetApp.getActiveSpreadsheet()).onEdit().create();
+  var sh = getSheet();   // makes sure the columns exist
+  getContentSheet();     // makes sure the "Content Today" tab exists
+  getWaSheet();          // makes sure the "WhatsApp Queue" tab exists
+  try {                  // dropdown for Payment status (still accepts any other typed value)
+    var rule = SpreadsheetApp.newDataValidation().requireValueInList(['PENDING', 'LINK_OPENED', 'PAID_CLAIMED', 'PAID'], true).setAllowInvalid(true).build();
+    sh.getRange(2, COL['Payment status'], 1000, 1).setDataValidation(rule);
+  } catch (e) { Logger.log('Dropdown not added: ' + e); }
+  Logger.log('Triggers created: hourlyTasks (hourly), onSheetEdit (when you edit the sheet), sendDailyContent (daily, ' + DAILY_HOUR + ':00-' + (DAILY_HOUR + 1) + ':00 ' + TZ + ').');
+}
+function removeTriggers() { clearAutoTriggers(); Logger.log('Automation triggers removed.'); }
+
+/* Hourly: welcome anyone you marked PAID (safety net for the on-edit trigger), plus the optional reminder. */
+function hourlyTasks() {
+  sendPendingWelcomes();
+  if (SEND_PAYMENT_REMINDER) { runReminders(false); }
+}
+
+/* Fires when you edit the sheet (installable trigger, so it is allowed to send email). */
+function onSheetEdit(e) {
+  try {
+    if (!e || !e.range) { return; }
+    var sheet = e.range.getSheet();
+    if (sheet.getName() !== SHEET_NAME) { return; }
+    loadCols(sheet);
+    var c1 = e.range.getColumn(), c2 = c1 + e.range.getNumColumns() - 1;
+    if (COL['Payment status'] >= c1 && COL['Payment status'] <= c2) { sendPendingWelcomes(); }
+  } catch (err) { Logger.log('onSheetEdit: ' + err); }
 }
 
 function canSend(extra) { return MailApp.getRemainingDailyQuota() > QUOTA_RESERVE + (extra || 0); }
@@ -247,6 +280,7 @@ function sendReminders() { return runReminders(false); }
 function remindersDryRun() { return runReminders(true); }
 
 function runReminders(dry) {
+  if (!SEND_PAYMENT_REMINDER) { Logger.log('Payment reminder is switched off (SEND_PAYMENT_REMINDER = false).'); return { disabled: true }; }
   var lock = LockService.getScriptLock();
   var log = { checked: 0, due: 0, sent: 0, skipped: 0, dry: !!dry };
   try {
@@ -324,25 +358,98 @@ function entriesFor(entries, s) {
   });
 }
 
+/* ---------- Welcome email: once, when Payment status becomes PAID ---------- */
+function addDays(ymd, n) {
+  var p = ymd.split('-');
+  return new Date(Date.UTC(+p[0], +p[1] - 1, +p[2] + n)).toISOString().slice(0, 10);
+}
+function sendPendingWelcomes() { return withLock(function () { return doWelcomes(getSheet(), false, false); }); }
+function welcomesDryRun() { return withLock(function () { return doWelcomes(getSheet(), true, false); }); }
+function withLock(fn) {
+  var lock = LockService.getScriptLock();
+  try { lock.waitLock(20000); return fn(); } finally { try { lock.releaseLock(); } catch (x) {} }
+}
+
+/* Runs inside a lock. startToday = the 9 AM run itself calls this, so the first content goes out in the same run. */
+function doWelcomes(sh, dry, startToday) {
+  var log = { sent: 0, skipped: 0, quotaStopped: 0, dry: !!dry };
+  var last = sh.getLastRow();
+  if (last < 2) { return log; }
+  var data = sh.getRange(2, 1, last - 1, NCOLS).getValues();
+  function g(row, h) { return COL[h] ? row[COL[h] - 1] : ''; }
+  var today = todayYmd();
+  for (var i = 0; i < data.length; i++) {
+    var row = data[i], r = i + 2;
+    if (String(g(row, 'Payment status')).trim().toUpperCase() !== 'PAID') { continue; }   // PAID_CLAIMED does not trigger the welcome
+    if (String(g(row, 'Welcome sent')) !== '') { continue; }                                // once only
+    var name = String(g(row, 'Name')), email = String(g(row, 'Email')).trim();
+    if (isTestRow(name, email)) { if (!dry) { setCell(sh, r, 'Welcome sent', 'SKIPPED test row'); } continue; }
+    if (!validEmail(email)) {
+      log.skipped++;
+      if (!dry) { setCell(sh, r, 'Welcome sent', 'SKIPPED no valid email'); setCell(sh, r, 'Delivery status', 'EMAIL_NOT_SENT: invalid email'); }
+      continue;
+    }
+    var start = toYmd(g(row, 'Content start date'));
+    if (!start) { start = (startToday || Number(Utilities.formatDate(new Date(), TZ, 'H')) < DAILY_HOUR) ? today : addDays(today, 1); }
+    if (dry) { Logger.log('WOULD WELCOME: ' + name + ' <' + email + '>, content starts ' + start); log.sent++; continue; }
+    if (MailApp.getRemainingDailyQuota() < 1) {
+      log.quotaStopped++;
+      setCell(sh, r, 'Delivery status', 'WELCOME_NOT_SENT: daily quota used up (will retry)');
+      break;
+    }
+    if (!toYmd(g(row, 'Content start date'))) { setCell(sh, r, 'Content start date', start); }
+    var res = sendWelcomeEmail(rowToSignup(sh, r), start);
+    setCell(sh, r, 'Delivery status', res);
+    setCell(sh, r, 'Welcome sent', res === 'WELCOME_SENT' ? new Date().toISOString() : 'FAILED ' + new Date().toISOString());
+    if (res === 'WELCOME_SENT') { log.sent++; }
+  }
+  Logger.log('Welcomes: ' + JSON.stringify(log));
+  return log;
+}
+
+/* ---------- (b) every morning: the day's content, by the channel they chose ---------- */
+function getWaSheet() {
+  var ss = SpreadsheetApp.getActiveSpreadsheet();
+  var sh = ss.getSheetByName(WA_TAB);
+  if (!sh) {
+    sh = ss.insertSheet(WA_TAB);
+    sh.appendRow(['Date', 'Day', 'Name', 'WhatsApp', 'Message', 'Click to send', 'Sent? (type x when done)', 'Submission ID']);
+    sh.setFrozenRows(1);
+  }
+  return sh;
+}
+function channelOf(s) {   // 'email' | 'whatsapp' | 'both'
+  var c = String(s.channel || '').toLowerCase();
+  var w = c.indexOf('whats') >= 0, m = c.indexOf('mail') >= 0;
+  return (c.indexOf('both') >= 0 || (w && m)) ? 'both' : (w ? 'whatsapp' : 'email');
+}
+function waDigits(n) { return String(n || '').replace(/\D/g, '').replace(/^0+/, ''); }
+
 function sendDailyContent() { return runDaily(false); }
 function dailyDryRun() { return runDaily(true); }
 
 function runDaily(dry) {
   var lock = LockService.getScriptLock();
-  var log = { today: '', eligible: 0, sent: 0, nothingToSend: 0, notYetStarted: 0, finished: 0, failed: 0, quotaStopped: 0, dry: !!dry };
+  var log = { today: '', eligible: 0, emailed: 0, queued: 0, nothingToSend: 0, notYetStarted: 0, finished: 0, failed: 0, quotaStopped: 0, welcomes: 0, dry: !!dry };
   try {
     lock.waitLock(20000);
     var today = todayYmd(); log.today = today;
     var sh = getSheet(), last = sh.getLastRow();
     if (last < 2) { return log; }
+    log.welcomes = doWelcomes(sh, dry, true).sent;     // anyone marked PAID but not yet welcomed gets it first
     var entries = readContentEntries(today);
     var data = sh.getRange(2, 1, last - 1, NCOLS).getValues();
     function g(row, h) { return COL[h] ? row[COL[h] - 1] : ''; }
+    var queue = [];
     for (var i = 0; i < data.length; i++) {
       var row = data[i], r = i + 2;
       if (String(g(row, 'Payment status')).trim().toUpperCase() !== 'PAID') { continue; }   // owner sets PAID after checking Razorpay
       var email = String(g(row, 'Email')).trim(), name = String(g(row, 'Name'));
-      if (!validEmail(email) || isTestRow(name, email)) { continue; }
+      if (isTestRow(name, email)) { continue; }
+      var s = rowToSignup(sh, r), ch = channelOf(s);
+      var wantEmail = ch !== 'whatsapp', wantWa = ch !== 'email';
+      var emailOk = validEmail(email), waNum = waDigits(s.whatsapp), waOk = waNum.length >= 8;
+      if (!(wantEmail && emailOk) && !(wantWa && waOk)) { continue; }
       log.eligible++;
       var start = toYmd(g(row, 'Content start date'));
       if (!start) { start = today; if (!dry) { setCell(sh, r, 'Content start date', today); } }   // blank = starts at this run
@@ -353,33 +460,38 @@ function runDaily(dry) {
         if (!dry && String(g(row, 'Delivery status')).indexOf('SPRINT_COMPLETE') !== 0) { setCell(sh, r, 'Delivery status', 'SPRINT_COMPLETE (' + SPRINT_DAYS + ' days)'); }
         continue;
       }
-      if (toYmd(g(row, 'Last content sent')) === today) { continue; }                       // already emailed today
-      var s = rowToSignup(sh, r);
+      if (toYmd(g(row, 'Last content sent')) === today) { continue; }                       // already delivered today
       var mine = entriesFor(entries, s);
       if (!mine.length) { log.nothingToSend++; continue; }                                    // nothing for this person today: skip
-      if (SKIP_EMAIL_IF_WHATSAPP_ONLY && /^whatsapp$/i.test(s.channel)) {
-        if (!dry) { setCell(sh, r, 'Delivery status', 'WHATSAPP_MANUAL: day ' + day + ' content is ready to send by hand'); }
-        continue;
+      if (dry) { Logger.log('WOULD DELIVER day ' + day + ' to ' + name + ' via ' + ch + ': ' + mine.length + ' item(s)'); log.emailed += wantEmail && emailOk ? 1 : 0; log.queued += wantWa && waOk ? 1 : 0; continue; }
+      var parts = [], delivered = false;
+      if (wantEmail && emailOk) {
+        if (!canSend(0)) {
+          log.quotaStopped++; parts.push('CONTENT_NOT_SENT: daily quota used up (day ' + day + ')');
+        } else {
+          var res = sendContentEmail(s, day, mine);
+          if (res === 'CONTENT_SENT') { log.emailed++; delivered = true; parts.push('CONTENT_SENT day ' + day + '/' + SPRINT_DAYS); }
+          else { log.failed++; parts.push(res + ' (day ' + day + ')'); }
+        }
       }
-      if (dry) { Logger.log('WOULD SEND day ' + day + ' to ' + name + ' <' + email + '>: ' + mine.length + ' item(s)'); log.sent++; continue; }
-      if (!canSend(0)) {
-        log.quotaStopped++;
-        setCell(sh, r, 'Delivery status', 'CONTENT_NOT_SENT: daily quota used up (day ' + day + ')');
-        continue;
+      if (wantWa) {
+        if (waOk) {
+          queue.push({ date: today, day: day, name: name, number: waNum, message: waMessage(s, day, mine), id: s.id });
+          log.queued++; delivered = true; parts.push('WHATSAPP_QUEUED day ' + day + '/' + SPRINT_DAYS);
+        } else { parts.push('WHATSAPP_NOT_QUEUED: invalid number'); }
       }
-      var res = sendContentEmail(s, day, mine);
-      if (res === 'CONTENT_SENT') {
-        log.sent++;
+      setCell(sh, r, 'Delivery status', parts.join('; '));
+      if (delivered) {
         setCell(sh, r, 'Last content sent', today);
         setCell(sh, r, 'Content days sent', (Number(g(row, 'Content days sent')) || 0) + 1);
-        setCell(sh, r, 'Delivery status', 'CONTENT_SENT day ' + day + '/' + SPRINT_DAYS);
-      } else {
-        log.failed++;
-        setCell(sh, r, 'Delivery status', res + ' (day ' + day + ')');
       }
     }
+    if (!dry && queue.length) {
+      writeWaQueue(queue);
+      if (SEND_OWNER_DIGEST) { sendQueueDigest(queue); }
+    }
     // entries with a blank date are "for today": stamp today's date so they are not sent again tomorrow
-    if (!dry && log.sent > 0) {
+    if (!dry && (log.emailed + log.queued) > 0) {
       var cs = getContentSheet();
       entries.forEach(function (e) { if (e.blankDate) { cs.getRange(e.row, 1).setValue(today); } });
     }
@@ -388,6 +500,47 @@ function runDaily(dry) {
   } finally {
     try { lock.releaseLock(); } catch (x) {}
   }
+}
+
+function waLink(q) { return 'https://wa.me/' + q.number + '?text=' + encodeURIComponent(q.message); }
+
+function writeWaQueue(queue) {
+  var sh = getWaSheet();
+  queue.forEach(function (q) {
+    sh.appendRow([q.date, q.day, safe(q.name), safe('+' + q.number), q.message, '', '', q.id]);
+    var r = sh.getLastRow();
+    sh.getRange(r, 6).setFormula('=HYPERLINK("' + waLink(q).replace(/"/g, '%22') + '","Send on WhatsApp")');
+  });
+}
+
+function sendQueueDigest(queue) {
+  try {
+    var to = OWNER_EMAIL || Session.getEffectiveUser().getEmail();
+    if (!to || !canSend(0)) { return; }
+    var url = SpreadsheetApp.getActiveSpreadsheet().getUrl ? SpreadsheetApp.getActiveSpreadsheet().getUrl() : '';
+    var subject = 'WhatsApp queue: ' + queue.length + ' message' + (queue.length === 1 ? '' : 's') + ' to send today';
+    var text = ['Today\'s WhatsApp messages are ready. Open the "' + WA_TAB + '" tab' + (url ? ' (' + url + ')' : '') + ' and tap "Send on WhatsApp" on each row, or use the links below.', ''];
+    var items = '';
+    queue.forEach(function (q) {
+      text.push(q.name + ' (+' + q.number + ', day ' + q.day + '): ' + waLink(q));
+      items += '<p style="margin:0 0 10px;font-family:' + EM.sans + ';font-size:15px;line-height:22px;color:' + EM.ink + ';"><b>' + esc(q.name) + '</b> <span style="color:' + EM.muted + ';">+' + esc(q.number) + ', day ' + q.day + '</span><br><a href="' + esc(waLink(q)) + '" target="_blank" style="color:' + EM.accent + ';font-weight:600;">Send on WhatsApp</a></p>';
+    });
+    var rows = eRow('<h1 style="margin:0 0 8px;font-family:' + EM.serif + ';font-weight:normal;font-size:26px;line-height:32px;color:' + EM.charcoal + ';">' + queue.length + ' WhatsApp message' + (queue.length === 1 ? '' : 's') + ' to send</h1>' +
+      ePara('Each link opens WhatsApp with the message ready. Tap send.') + items +
+      (url ? eButton(url, 'Open the WhatsApp Queue') : ''), '28px 32px 24px');
+    MailApp.sendEmail({ to: to, subject: subject, body: text.join('\n'), htmlBody: eShell('Your WhatsApp queue for today is ready.', subject, rows), name: SENDER_NAME });
+  } catch (err) { Logger.log('Digest not sent: ' + err); }
+}
+
+function waMessage(s, day, entries) {
+  var L = ['Good morning ' + firstName(s.name) + '! Your RealtorOne Content Sprint, day ' + day + ' of ' + SPRINT_DAYS + ':', ''];
+  entries.forEach(function (e) {
+    if (e.note) { L.push(String(e.note).slice(0, 500)); }
+    if (e.link) { L.push(e.link); }
+    L.push('');
+  });
+  L.push('Reply here if you need anything.');
+  return L.join('\n');
 }
 
 /* ---------- emails ---------- */
@@ -414,17 +567,27 @@ function sendOwnerEmail(subject, body) {
 function sendConfirmationEmail(s) {
   try {
     if (MailApp.getRemainingDailyQuota() < 1) { return 'EMAIL_NOT_SENT: daily quota used up'; }
-    MailApp.sendEmail({ to: s.email, subject: 'Your Content Sprint spot request, ' + firstName(s.name),
+    MailApp.sendEmail({ to: s.email, subject: 'Your RealtorOne Content Sprint: exactly what you get, ' + firstName(s.name),
       body: confirmationText(s), htmlBody: confirmationHtml(s), name: SENDER_NAME });
     return 'CONFIRMATION_SENT';
   } catch (err) { return 'EMAIL_FAILED: ' + String(err).slice(0, 120); }
 }
 
-function sendWelcomeEmail(s) {
+function sendClaimNote(s) {
   try {
     if (MailApp.getRemainingDailyQuota() < 1) { return 'EMAIL_NOT_SENT: daily quota used up'; }
-    MailApp.sendEmail({ to: s.email, subject: 'Welcome to the RealtorOne Content Sprint',
-      body: welcomeText(s), htmlBody: welcomeHtml(s), name: SENDER_NAME });
+    MailApp.sendEmail({ to: s.email, subject: 'We are confirming your payment, ' + firstName(s.name),
+      body: claimText(s), htmlBody: claimHtml(s), name: SENDER_NAME });
+    return 'CLAIM_NOTE_SENT';
+  } catch (err) { return 'EMAIL_FAILED: ' + String(err).slice(0, 120); }
+}
+
+/* startYmd = the day their first content goes out (yyyy-MM-dd) */
+function sendWelcomeEmail(s, startYmd) {
+  try {
+    if (MailApp.getRemainingDailyQuota() < 1) { return 'EMAIL_NOT_SENT: daily quota used up'; }
+    MailApp.sendEmail({ to: s.email, subject: 'Welcome to the RealtorOne Content Sprint, ' + firstName(s.name),
+      body: welcomeText(s, startYmd), htmlBody: welcomeHtml(s, startYmd), name: SENDER_NAME });
     return 'WELCOME_SENT';
   } catch (err) { return 'EMAIL_FAILED: ' + String(err).slice(0, 120); }
 }
@@ -438,31 +601,84 @@ function offerLine() {
 function waUrl() { var d = String(WHATSAPP_NUMBER || '').replace(/\D/g, ''); return d ? 'https://wa.me/' + d : ''; }
 function firstName(n) { return plain(n, 40).split(' ')[0] || 'there'; }
 
+/* ---- shared wording: taken from the landing page so the emails say exactly what the page says ---- */
+var DAY_ITEMS = [['Post 1', 'Static', 'Market insight'], ['Post 2', 'Static', 'Personal-brand authority'],
+                 ['Carousel 1', 'Carousel', 'Educational topic'], ['Carousel 2', 'Carousel', 'Community insight'],
+                 ['Carousel 3', 'Carousel', 'Buyer / seller psychology']];
+var YOU_GET = ['2 static posts a day', '3 carousel posts a day', 'Captions included', 'Dubai real-estate topics and current market trends',
+               'Content relevant to your specialization', 'Ready-to-post creative', 'No content planning required'];
+var QUOTE_LINE = 'You don\'t know which post will start the conversation that becomes your next client.';
+var DISCLAIMER = 'Content keeps you visible. It does not guarantee leads or deals.';
+var WRAP_LINE = '30 days x 5 posts/day = 150 opportunities to be seen.';
+
+function channelPhrase(s) {
+  var ch = channelOf(s), wa = s.whatsapp ? ' (' + s.whatsapp + ')' : '', em = s.email ? ' (' + s.email + ')' : '';
+  return ch === 'email' ? 'by email' + em : (ch === 'whatsapp' ? 'on WhatsApp' + wa : 'by email' + em + ' and on WhatsApp' + wa);
+}
+/* "today" / "tomorrow, Saturday 17 October" / "on Monday 20 October" + the time */
+function startPhrase(startYmd) {
+  if (!startYmd) { return 'at the next 9:00 AM Dubai time'; }
+  var diff = dayDiff(todayYmd(), startYmd);
+  var p = startYmd.split('-');
+  var nice = Utilities.formatDate(new Date(Date.UTC(+p[0], +p[1] - 1, +p[2], 12)), 'UTC', 'EEEE d MMMM');
+  return (diff <= 0 ? 'today' : (diff === 1 ? 'tomorrow, ' + nice : 'on ' + nice)) + ' at 9:00 AM Dubai time';
+}
+function hasContentToday(startYmd) { return startYmd && dayDiff(todayYmd(), startYmd) <= 0; }
+
+/* 1) CONFIRMATION (on signup) */
 function confirmationText(s) {
   var L = ['Hi ' + firstName(s.name) + ',', '',
-    'Thanks for completing the RealtorOne Content Sprint onboarding. We have your details.', '',
-    'WHAT WE NOTED',
-    'Area: ' + s.areas, 'Property: ' + s.types, 'Focus: ' + s.deal, 'Content sent via: ' + s.channel, '',
-    'NEXT STEP',
-    'Secure your founding spot (' + SPOTS_TEXT() + ').', offerLine()];
-  if (PAYMENT_URL) { L.push('Pay here: ' + PAYMENT_URL); } else { L.push('Go back to the page and tap "Secure my spot": ' + PAGE_URL); }
-  L.push('', 'WHAT YOU GET', 'Every morning at 9 AM Dubai time: 2 static posts + 3 carousels, captions included.',
-    '30 days x 5 posts/day = 150 pieces of content.', '',
-    'Content keeps you visible. It does not guarantee leads or deals.');
+    'Thanks for completing the onboarding. Here is exactly what the RealtorOne Content Sprint is, and what happens next.', '',
+    'WHAT IT IS',
+    'Every morning at 9 AM Dubai time, you receive ready-to-post content built around your market, your specialization and your personal brand.',
+    '30 days. 150 pieces of content. One less thing to worry about.', '',
+    'WHAT ONE CONTENT DAY LOOKS LIKE'];
+  DAY_ITEMS.forEach(function (d) { L.push('- ' + d[0] + ' (' + d[1] + '): ' + d[2]); });
+  L.push('Captions are included with every post.', '',
+    'THE MATHS', '5 posts a day x 30 days = 150 pieces of content (60 static posts + 90 carousels).', '',
+    'BUILT AROUND YOU',
+    'Area: ' + (s.areas || '-'), 'Property: ' + (s.types || '-'), 'Focus: ' + (s.deal || '-'), 'Content sent: ' + channelPhrase(s), '',
+    'FOUNDING OFFER',
+    'You get it for ' + money() + ' / 30 days' + (regularMoney() ? ' (regular price ' + regularMoney() + ')' : '') + '.',
+    'Only 10 founding spots, because every realtor\'s content is personalised.', '');
+  L.push(PAYMENT_URL ? 'Complete payment: ' + PAYMENT_URL : 'Complete payment on the page: ' + PAGE_URL);
+  L.push('', 'WHAT HAPPENS NEXT',
+    '1. Complete your payment with the link above.',
+    '2. We check it and send you a welcome email with your start date.',
+    '3. From the next 9 AM Dubai time, your content arrives ' + channelPhrase(s) + ', every morning for 30 days.', '', DISCLAIMER);
   if (waUrl()) { L.push('', 'Questions? WhatsApp us: ' + waUrl()); }
   L.push('', '--', 'RealtorOne Content Sprint, a RealtorOne project');
   return L.join('\n');
 }
 
-function welcomeText(s) {
-  var L = ['Hi ' + firstName(s.name) + ',', '', 'Welcome to the RealtorOne Content Sprint.', '',
-    'We have noted your payment and will confirm it shortly. Your content starts at the next 9:00 AM Dubai time after we confirm, then every morning for 30 days.', '',
-    'WHAT HAPPENS NEXT',
-    '1. We confirm your payment and message you on ' + (s.channel || 'your chosen channel') + '.',
-    '2. Next 9 AM Dubai time: your first day of ready-to-post content arrives.',
-    '3. 30 days: 2 static posts and 3 carousels every morning, captions included.', '',
-    '30 days x 5 posts/day = 150 opportunities to be seen.', '',
-    'You don\'t know which post will start the conversation that becomes your next client.'];
+/* (short note when they tap "I've completed my payment") */
+function claimText(s) {
+  var L = ['Hi ' + firstName(s.name) + ',', '',
+    'Thanks, we have your note that you completed the payment. We are confirming it now.', '',
+    'As soon as it is confirmed you get your welcome email with your start date. Nothing else for you to do.'];
+  if (waUrl()) { L.push('', 'Questions? WhatsApp us: ' + waUrl()); }
+  L.push('', '--', 'RealtorOne Content Sprint, a RealtorOne project');
+  return L.join('\n');
+}
+
+/* 2) WELCOME (when the owner sets Payment status = PAID) */
+function welcomeText(s, startYmd) {
+  var L = ['Hi ' + firstName(s.name) + ',', '', 'Welcome to the RealtorOne Content Sprint. Your payment is confirmed.', '',
+    'WHEN IT STARTS',
+    'Your first day of content arrives ' + startPhrase(startYmd) + ', then every morning for 30 days.', '',
+    'HOW IT IS DELIVERED',
+    'Your content comes ' + channelPhrase(s) + '.', '',
+    'WHAT YOU GET'];
+  YOU_GET.forEach(function (x) { L.push('- ' + x); });
+  L.push('', 'WHAT A CONTENT DAY LOOKS LIKE', '9:00 AM Dubai: your content for the day lands, ready to post.');
+  DAY_ITEMS.forEach(function (d) { L.push('- ' + d[0] + ' (' + d[1] + '): ' + d[2]); });
+  L.push('Captions included with every post.', '',
+    'THE MATHS', '5 posts a day x 30 days = 150 pieces of content (60 static posts + 90 carousels).', '',
+    'WHAT WE NEED FROM YOU',
+    '- Keep ' + (channelOf(s) === 'email' ? 'an eye on your inbox' : (channelOf(s) === 'whatsapp' ? 'WhatsApp open' : 'your inbox and WhatsApp open')) + ' at 9 AM Dubai time, and post what you receive.',
+    '- Reply to this email if your area, specialization or delivery channel changes.',
+    '- Check spam / Promotions once, and mark us as not spam.', '',
+    'AT THE END OF YOUR 30 DAYS', WRAP_LINE, '', QUOTE_LINE, DISCLAIMER);
   if (waUrl()) { L.push('', 'Questions? WhatsApp us: ' + waUrl()); }
   L.push('', '--', 'RealtorOne Content Sprint, a RealtorOne project');
   return L.join('\n');
@@ -512,33 +728,92 @@ function eWa() {
   return waUrl() ? '<p style="margin:8px 0 0;font-family:' + EM.sans + ';font-size:14px;line-height:21px;color:' + EM.muted + ';">Questions? <a href="' + esc(waUrl()) + '" target="_blank" style="color:' + EM.ink + ';">Message us on WhatsApp</a>.</p>' : '';
 }
 
+/* ---- small HTML blocks (inline CSS, table layout) ---- */
+function eHello(s) { return '<p style="margin:0 0 6px;font-family:' + EM.serif + ';font-size:20px;line-height:28px;color:' + EM.charcoal + ';">Hi ' + esc(firstName(s.name)) + ',</p>'; }
+function eH1(t, size) { return '<h1 style="margin:0 0 12px;font-family:' + EM.serif + ';font-weight:normal;font-size:' + (size || 30) + 'px;line-height:' + ((size || 30) + 6) + 'px;color:' + EM.charcoal + ';">' + esc(t) + '</h1>'; }
+function eStep(n, t) {
+  return '<tr><td width="40" valign="top" style="padding:0 0 12px;"><div style="width:28px;height:28px;border-radius:14px;background:' + EM.charcoal + ';color:' + EM.cream + ';font-family:' + EM.serif + ';font-size:15px;line-height:28px;text-align:center;">' + n + '</div></td>' +
+    '<td valign="top" style="padding:3px 0 12px;font-family:' + EM.sans + ';font-size:15px;line-height:23px;color:' + EM.ink + ';">' + t + '</td></tr>';
+}
+function eSteps(items) { return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' + items.map(function (t, i) { return eStep(i + 1, t); }).join('') + '</table>'; }
+function eChecks(items) {
+  return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' + items.map(function (t) {
+    return '<tr><td width="26" valign="top" style="padding:0 0 8px;font-family:' + EM.sans + ';font-size:15px;line-height:23px;color:' + EM.accent + ';font-weight:700;">&#10003;</td>' +
+      '<td valign="top" style="padding:0 0 8px;font-family:' + EM.sans + ';font-size:15px;line-height:23px;color:' + EM.ink + ';">' + t + '</td></tr>';
+  }).join('') + '</table>';
+}
+function eDay() {
+  return '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#fff;border:1px solid ' + EM.line + ';border-radius:10px;">' +
+    '<tr><td colspan="2" style="padding:11px 16px;font-family:' + EM.sans + ';font-size:13px;line-height:19px;font-weight:700;color:' + EM.accent + ';letter-spacing:1px;">9:00 AM &middot; DUBAI</td></tr>' +
+    DAY_ITEMS.map(function (d) {
+      return '<tr><td style="padding:10px 16px;border-top:1px solid ' + EM.line + ';font-family:' + EM.sans + ';font-size:15px;line-height:22px;color:' + EM.ink + ';"><b>' + esc(d[0]) + '</b> <span style="font-size:11px;letter-spacing:1px;text-transform:uppercase;color:' + EM.muted + ';">&nbsp;' + esc(d[1]) + '</span></td>' +
+        '<td align="right" style="padding:10px 16px;border-top:1px solid ' + EM.line + ';font-family:' + EM.sans + ';font-size:14px;line-height:21px;color:' + EM.muted + ';">' + esc(d[2]) + '</td></tr>';
+    }).join('') + '</table>' +
+    '<p style="margin:8px 0 0;font-family:' + EM.sans + ';font-size:14px;line-height:21px;color:' + EM.muted + ';">Captions included with every post.</p>';
+}
+function eMaths() {
+  function cell(b, t) { return '<td width="33%" align="center" style="padding:14px 4px;background:#fff;border:1px solid ' + EM.line + ';border-radius:10px;"><div style="font-family:' + EM.serif + ';font-size:28px;line-height:32px;color:' + EM.charcoal + ';">' + b + '</div><div style="font-family:' + EM.sans + ';font-size:12px;line-height:17px;color:' + EM.muted + ';">' + t + '</div></td>'; }
+  return '<table role="presentation" width="100%" cellpadding="0" cellspacing="6" border="0" style="width:100%;"><tr>' + cell('5', 'posts a day') + cell('30', 'days') + cell('150', 'pieces of content') + '</tr></table>' +
+    '<p style="margin:8px 0 0;font-family:' + EM.sans + ';font-size:14px;line-height:21px;color:' + EM.ink + ';"><b>60 static posts + 90 carousels.</b> The proof of the work, not the point of it.</p>';
+}
+function ePrice() {
+  return '<div style="background:#fff;border:1px solid ' + EM.accent + ';border-radius:12px;padding:16px 18px;">' +
+    '<div style="font-family:' + EM.sans + ';font-size:11px;line-height:16px;letter-spacing:2px;text-transform:uppercase;font-weight:700;color:' + EM.accent + ';">Founding offer</div>' +
+    (regularMoney() ? '<div style="margin-top:6px;font-family:' + EM.sans + ';font-size:14px;line-height:20px;color:' + EM.muted + ';">Regular price <span style="text-decoration:line-through;">' + esc(regularMoney()) + '</span></div>' : '') +
+    '<div style="font-family:' + EM.serif + ';font-size:34px;line-height:40px;color:' + EM.charcoal + ';">' + esc(money()) + ' <span style="font-family:' + EM.sans + ';font-size:14px;color:' + EM.muted + ';">/ 30 days</span></div>' +
+    '<div style="font-family:' + EM.sans + ';font-size:14px;line-height:21px;color:' + EM.ink + ';">You get it for ' + esc(money()) + '. <b>Only 10 founding spots</b>, because every realtor&rsquo;s content is personalised.</div></div>';
+}
+function eQuote(top) { return '<p style="margin:' + (top === undefined ? 16 : top) + 'px 0 0;font-family:' + EM.serif + ';font-style:italic;font-size:17px;line-height:25px;color:' + EM.ink + ';">' + esc(QUOTE_LINE.replace("don't", 'don\u2019t')) + '</p>' +
+  '<p style="margin:8px 0 0;font-family:' + EM.sans + ';font-size:12px;line-height:18px;color:' + EM.muted + ';">' + esc(DISCLAIMER) + '</p>'; }
+
+/* 1) CONFIRMATION */
 function confirmationHtml(s) {
-  var rows = eRow('<p style="margin:0 0 6px;font-family:' + EM.serif + ';font-size:20px;line-height:28px;color:' + EM.charcoal + ';">Hi ' + esc(firstName(s.name)) + ',</p>' +
-      ePara('Thanks for completing the Content Sprint onboarding. We have your details and will build your content around them.'), '32px 32px 8px') +
-    eRow(eLabel('What we noted') + eDetails([['Area', s.areas], ['Property', s.types], ['Focus', s.deal], ['Content sent via', s.channel]]), '8px 32px 20px') +
-    eRow(eLabel('Next step') +
-      ePara('Secure your founding spot (' + SPOTS_TEXT() + ').') +
-      '<p style="margin:0 0 12px;font-family:' + EM.sans + ';font-size:16px;line-height:25px;color:' + EM.ink + ';">Founding offer: you get it for <b>' + esc(money()) + '</b> / 30 days' + (regularMoney() ? ' <span style="color:' + EM.muted + ';">(regular price <span style="text-decoration:line-through;">' + esc(regularMoney()) + '</span>)</span>' : '') + '.</p>' +
-      (PAYMENT_URL ? eButton(PAYMENT_URL, 'Secure my spot for ' + money()) : eButton(PAGE_URL, 'Back to the page')) +
-      '<p style="margin:12px 0 0;font-family:' + EM.sans + ';font-size:14px;line-height:21px;color:' + EM.ink + ';">Every morning at 9 AM Dubai time: 2 static posts + 3 carousels, captions included. 30 days &times; 5 posts/day = 150 pieces of content.</p>' +
-      '<p style="margin:10px 0 0;font-family:' + EM.sans + ';font-size:12px;line-height:18px;color:' + EM.muted + ';">Content keeps you visible. It does not guarantee leads or deals.</p>' + eWa(), '8px 32px 26px');
-  return eShell('We have your Content Sprint details. One step left: secure your spot.', 'Your Content Sprint spot request', rows);
+  var rows = eRow(eHello(s) + eH1('Here is exactly what you get', 30) +
+      ePara('Thanks for completing the onboarding. This is what the RealtorOne Content Sprint is, and what happens next.'), '32px 32px 8px') +
+    eRow(eLabel('What it is') +
+      '<p style="margin:0 0 10px;font-family:' + EM.serif + ';font-size:20px;line-height:28px;color:' + EM.charcoal + ';">Every morning at 9 AM Dubai time, receive ready-to-post content built around your market, your specialization and your personal brand.</p>' +
+      ePara('30 days. 150 pieces of content. One less thing to worry about.'), '8px 32px 14px') +
+    eRow(eLabel('What one content day looks like') + eDay(), '8px 32px 18px') +
+    eRow(eLabel('The maths') + eMaths(), '8px 32px 18px') +
+    eRow(eLabel('Built around you') + eDetails([['Area', s.areas], ['Property', s.types], ['Focus', s.deal], ['Content sent', channelPhrase(s)]]), '8px 32px 18px') +
+    eRow(ePrice() + '<div style="height:14px;line-height:14px;font-size:1px;">&nbsp;</div>' +
+      (PAYMENT_URL ? eButton(PAYMENT_URL, 'Complete payment \u00b7 ' + money()) : eButton(PAGE_URL, 'Back to the page to pay')), '8px 32px 10px') +
+    eRow(eLabel('What happens next') + eSteps([
+      '<b>Complete your payment</b> with the button above.',
+      '<b>We check it</b> and send you a welcome email with your start date.',
+      '<b>From the next 9 AM Dubai time</b> your content arrives ' + esc(channelPhrase(s)) + ', every morning for 30 days.']), '8px 32px 6px') +
+    eRow(eQuote(0) + eWa(), '4px 32px 26px');
+  return eShell('Exactly what you get, and one step left: complete your payment.', 'Your RealtorOne Content Sprint', rows);
 }
 
-function welcomeHtml(s) {
-  function step(n, t) {
-    return '<tr><td width="40" valign="top" style="padding:0 0 12px;"><div style="width:28px;height:28px;border-radius:14px;background:' + EM.charcoal + ';color:' + EM.cream + ';font-family:' + EM.serif + ';font-size:15px;line-height:28px;text-align:center;">' + n + '</div></td>' +
-      '<td valign="top" style="padding:3px 0 12px;font-family:' + EM.sans + ';font-size:15px;line-height:23px;color:' + EM.ink + ';">' + t + '</td></tr>';
-  }
-  var rows = eRow('<p style="margin:0 0 6px;font-family:' + EM.serif + ';font-size:20px;line-height:28px;color:' + EM.charcoal + ';">Hi ' + esc(firstName(s.name)) + ',</p>' +
-      '<h1 style="margin:0 0 12px;font-family:' + EM.serif + ';font-weight:normal;font-size:32px;line-height:38px;color:' + EM.charcoal + ';">Welcome to the RealtorOne Content Sprint</h1>' +
-      ePara('We have noted your payment and will confirm it shortly. Your content starts at the next 9:00 AM Dubai time after we confirm, then every morning for 30 days.'), '32px 32px 8px') +
-    eRow(eLabel('What happens next') + '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0">' +
-      step(1, '<b>We confirm your payment</b> and message you on ' + esc(s.channel || 'your chosen channel') + '.') +
-      step(2, '<b>Next 9 AM Dubai time:</b> your first day of ready-to-post content arrives.') +
-      step(3, '<b>30 days:</b> 2 static posts and 3 carousels every morning, captions included.') + '</table>', '8px 32px 8px') +
-    eRow('<div style="border:1px solid ' + EM.accent + ';border-radius:12px;padding:16px;text-align:center;font-family:' + EM.serif + ';font-size:21px;line-height:28px;color:' + EM.charcoal + ';">30 days &times; 5 posts/day = 150 opportunities to be seen.</div>' +
-      '<p style="margin:16px 0 0;font-family:' + EM.serif + ';font-style:italic;font-size:17px;line-height:25px;color:' + EM.ink + ';">You don&rsquo;t know which post will start the conversation that becomes your next client.</p>' + eWa(), '10px 32px 26px');
+/* short claim note */
+function claimHtml(s) {
+  var rows = eRow(eHello(s) + eH1('We are confirming your payment', 28) +
+      ePara('Thanks, we have your note that you completed the payment. We are confirming it now.') +
+      ePara('As soon as it is confirmed you get your welcome email with your start date. Nothing else for you to do.') + eWa(), '32px 32px 26px');
+  return eShell('Thanks. We are confirming your payment.', 'We are confirming your payment', rows);
+}
+
+/* 2) WELCOME */
+function welcomeHtml(s, startYmd) {
+  var ch = channelOf(s);
+  var rows = eRow(eHello(s) + eH1('Welcome to the RealtorOne Content Sprint', 32) +
+      ePara('Your payment is confirmed. Here is what to expect.'), '32px 32px 8px') +
+    eRow(eLabel('When it starts') +
+      '<p style="margin:0 0 6px;font-family:' + EM.serif + ';font-size:22px;line-height:30px;color:' + EM.charcoal + ';">Your first day of content arrives ' + esc(startPhrase(startYmd)) + '.</p>' +
+      ePara('Then every morning for 30 days.'), '8px 32px 12px') +
+    eRow(eLabel('How it is delivered') + ePara('Your content comes ' + channelPhrase(s) + '.' +
+      (ch === 'email' ? '' : ' We message you on WhatsApp each morning.')), '8px 32px 12px') +
+    eRow(eLabel('What you get') + eChecks(YOU_GET.map(esc)), '8px 32px 12px') +
+    eRow(eLabel('What a content day looks like') + eDay(), '8px 32px 18px') +
+    eRow(eLabel('The maths') + eMaths(), '8px 32px 18px') +
+    eRow(eLabel('What we need from you') + eChecks([
+      'Keep ' + (ch === 'email' ? 'an eye on your inbox' : (ch === 'whatsapp' ? 'WhatsApp open' : 'your inbox and WhatsApp open')) + ' at 9 AM Dubai time, and post what you receive.',
+      'Reply to this email if your area, specialization or delivery channel changes.',
+      'Check spam / Promotions once, and mark us as not spam.']), '8px 32px 18px') +
+    eRow('<div style="border:1px solid ' + EM.accent + ';border-radius:12px;padding:16px;text-align:center;font-family:' + EM.serif + ';font-size:21px;line-height:28px;color:' + EM.charcoal + ';">' +
+      '<div style="font-family:' + EM.sans + ';font-size:11px;letter-spacing:2px;text-transform:uppercase;color:' + EM.accent + ';font-weight:700;margin-bottom:6px;">At the end of your 30 days</div>30 days &times; 5 posts/day = 150 opportunities to be seen.</div>' +
+      eQuote() + eWa(), '8px 32px 26px');
   return eShell('Welcome. Your 30 days of ready-to-post content are about to begin.', 'Welcome to the RealtorOne Content Sprint', rows);
 }
 
@@ -616,11 +891,11 @@ function safe(v) {
   return /^[=+\-@]/.test(s) ? "'" + s : s;
 }
 
-/* Optional: run from the editor to get both emails in your own inbox before going live. */
+/* Optional: run from the editor to get the confirmation, claim note and welcome in your own inbox (sent to YOU only). */
 function testEmailsToMe() {
   var me = Session.getActiveUser().getEmail() || Session.getEffectiveUser().getEmail();
   var s = { id: 'TEST', name: 'Test Realtor', email: me, whatsapp: '+971500000000', instagram: 'test.realtor', areas: 'Dubai Marina',
             types: 'Apartments', deal: 'Both', devs: '', comms: '', buyers: 'Investors', sellers: 'Landlords', years: '3–5 years',
-            langs: 'English', goals: 'Get more enquiries', freq: 'Daily', insp: ['@example'], channel: 'WhatsApp' };
-  Logger.log(sendConfirmationEmail(s) + ' / ' + sendWelcomeEmail(s) + ' to ' + me);
+            langs: 'English', goals: 'Get more enquiries', freq: 'Daily', insp: ['@example'], channel: 'Both' };
+  Logger.log(sendConfirmationEmail(s) + ' / ' + sendClaimNote(s) + ' / ' + sendWelcomeEmail(s, addDays(todayYmd(), 1)) + ' to ' + me);
 }

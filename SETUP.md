@@ -4,13 +4,13 @@ The page is one file, `index.html`. No server needed. `SUBMIT_ENDPOINT` and `PAY
 
 Live page: https://anatomyofacloser-cyber.github.io/realtorone-content-sprint/
 
-Steps 1 and 2 are done. **Step 4 (automation) is new: you need to redeploy and run `setupTriggers` once.**
+Steps 1 and 2 are done. **Step 4 (the three messages + automation) changed: you need to redeploy a New version and run `setupTriggers` again.**
 
 ## 1. Save signups in a Google Sheet and send the emails (Apps Script)
 1. Create a new Google Sheet with the Gmail account you want the emails to come from. Name it "Content Sprint signups".
 2. Open **Extensions > Apps Script**. Delete the sample code, paste everything from `apps-script.gs`, and save.
 3. At the top of the script, check the config: `WHATSAPP_NUMBER` is already set. `PAYMENT_URL` is already set. `OWNER_EMAIL` can stay empty: new-signup notices then go to the Gmail account that owns the sheet.
-4. Optional test: pick the function `testEmailsToMe`, click **Run**, approve the permissions. You get a sample confirmation email and a sample welcome email in your own inbox. The Execution log shows `CONFIRMATION_SENT / WELCOME_SENT`.
+4. Optional test: pick the function `testEmailsToMe`, click **Run**, approve the permissions. You get a sample confirmation, a "confirming payment" note and a welcome email in your own inbox (only yours). The Execution log shows `CONFIRMATION_SENT / CLAIM_NOTE_SENT / WELCOME_SENT`.
 5. Click **Deploy > New deployment**, type **Web app**. Execute as: **Me**. Who has access: **Anyone**. Click **Deploy** and approve (the script needs your sheet and permission to send email as you).
 6. Copy the **Web app URL** (ends in `/exec`). It is already pasted into `index.html` (`SUBMIT_ENDPOINT`). Only change it there if you ever create a brand-new deployment.
 7. Test on the live page with your own email. A row appears in the `Responses` tab, and you get the confirmation email.
@@ -31,7 +31,7 @@ If you edit `apps-script.gs` later: paste it over the old one, save, then **Depl
 
 (If you clear `PAYMENT_URL`, the page goes back to preview.) When `PAYMENT_URL` is empty the page shows "preview: the payment link isn't set yet" and no real payment can happen.
 
-**Important:** the page cannot see whether someone really paid. "I've completed my payment" (or `?paid=1`) only marks the row **PAID_CLAIMED** and emails you. **Always check the payment in Razorpay before you start someone's content.**
+**Important:** the page cannot see whether someone really paid. "I've completed my payment" (or `?paid=1`) only marks the row **PAID_CLAIMED**, sends the person a short "we are confirming your payment" note, and emails you. The full Welcome goes out only when you set the row to `PAID`. **Always check the payment in Razorpay before you start someone's content.**
 
 ## 3. Check the other settings (top of the `<script>` in `index.html`)
 ```js
@@ -47,47 +47,64 @@ var SPOTS           = 10;
 - If you change `CURRENCY`, `PRICE`, `REGULAR_PRICE` or the WhatsApp number, change the same lines at the top of `apps-script.gs` too.
 - Empty values hide their button/line. WhatsApp buttons appear on the payment step and the welcome screen.
 
-## 4. Automation: payment reminder + daily 9 AM content (new)
-**One-time steps (about 3 minutes):**
-1. In the Apps Script editor paste the new `apps-script.gs` over the old one and save. Keep your own `OWNER_EMAIL` if you set one.
-2. **Deploy > Manage deployments > pencil (Edit) > Version: New version > Deploy.** The `/exec` URL stays the same. (Without this, the live form still runs the OLD script.)
-3. Pick the function **`setupTriggers`** and click **Run**. Approve the permissions (the new one is "run when you are not here"). It creates the two triggers and the `Content Today` tab. Running it again is safe: it replaces the triggers, never doubles them. Check under the clock icon (Triggers).
+## 4. The three messages and the automation
+The flow sends **exactly three messages** to each person:
 
-**What runs by itself:**
-- **Every hour, `sendReminders`:** emails ONE reminder to people who signed up 24+ hours ago, ticked consent, and whose Payment status is not `PAID` / `PAID_CLAIMED`. It writes the time in **Reminder sent**, so nobody gets a second one. Signups older than 7 days are not reminded (`REMINDER_MAX_AGE_DAYS`). The reminder says their details are saved, shows the AED 400 offer and the Razorpay button, and tells them to reply if they already paid.
-- **Every day around 9 AM Dubai, `sendDailyContent`:** emails everyone whose Payment status is exactly **`PAID`**, for 30 days from their **Content start date** (blank = the first run after you set PAID, so the first email comes the same morning or the next 9 AM). It skips anyone with nothing to send today, anyone already emailed today, and anyone past day 30.
+| # | When | What | Sent by |
+|---|---|---|---|
+| 1 | They finish the onboarding (enter their email) | **Confirmation**: a clear picture of the Content Sprint (what it is, 9 AM Dubai every day, 2 static + 3 carousels with the 5 angles, captions included, built around their area / specialization, 30 days = 150 pieces: 60 static + 90 carousels, founding offer AED 400 vs regular AED 610, only 10 spots, what happens next) with a **Complete payment** button and your WhatsApp. | the web app, instantly |
+| 2 | **You set Payment status to `PAID`** in the sheet | **Welcome**: when content starts (date), how it is delivered (their chosen channel), what you get, what a content day looks like, what we need from them, and the 30-day wrap line. Once only, tracked in the **Welcome sent** column. | the on-edit trigger within seconds (the hourly trigger is the safety net) |
+| 3 | Every morning around 9 AM Dubai, for 30 days | **The day's content**, by the channel they chose: **Email** = emailed by the script. **WhatsApp** = added to the `WhatsApp Queue` tab for you to send with one tap. **Both** = both. | the daily trigger |
+
+Extra, small things that are not "marketing messages": when someone taps "I've completed my payment" they get a short "we are confirming your payment" note (`SEND_CLAIM_NOTE`, on by default; set `false` to turn off), and you get owner emails (new signup, payment claimed, the morning WhatsApp digest). The optional 24-hour payment reminder from the last version is **off by default** (`SEND_PAYMENT_REMINDER = false`) so the flow stays at three messages.
+
+**One-time steps after this update (about 3 minutes):**
+1. In the Apps Script editor paste the new `apps-script.gs` over the old one and save. Keep your own `OWNER_EMAIL` if you set one.
+2. **Deploy > Manage deployments > pencil (Edit) > Version: New version > Deploy.** The `/exec` URL stays the same. (Without this the live form still runs the OLD script and sends the OLD confirmation.)
+3. Pick the function **`setupTriggers`** and click **Run**. Approve the permissions again if Google asks (the script now also needs to react when you edit the sheet). **You must run it again even if you ran it before:** it deletes the old triggers and creates the new set (hourly, daily 9 AM Dubai, and "on edit"), the `Content Today` and `WhatsApp Queue` tabs, and a dropdown on Payment status. Running it again is always safe and never doubles anything. Check the clock icon (Triggers): you should see `hourlyTasks`, `sendDailyContent` and `onSheetEdit`.
+4. Optional: run `testEmailsToMe`. It sends the Confirmation, the "confirming payment" note and the Welcome **to your own address only**.
 
 **Your daily routine (about 2 minutes):**
-1. When money arrives in Razorpay, set that row's **Payment status** to `PAID` (and optionally a **Content start date**).
-2. Each day, before 9 AM Dubai, open the **`Content Today`** tab and add a row:
+1. When money arrives in Razorpay, set that person's **Payment status** to `PAID` (the dropdown has it). Their Welcome email goes out straight away and says when their first content arrives: today if you set PAID before 9 AM Dubai, otherwise tomorrow. You can also type a **Content start date** (`2026-10-20`) first to choose the day.
+2. Before 9 AM Dubai, open the **`Content Today`** tab and add a row:
+
    | Date | For | Link | Note |
    |---|---|---|---|
    | leave blank (= today) or `2026-10-20` | `ALL`, one person's email, or their Submission ID | a Google Drive / Canva / Notion link (https://...) | optional short text |
 
-   Blank date = "for today": after it is sent the script stamps today's date on that row, so it is not sent again tomorrow. You can add several rows (several links) and they all go in one email. A row with no link and no note is ignored.
-3. Check **Delivery status** in `Responses` the next morning.
+   Blank date = "for today": after it is sent the script stamps today's date on the row, so it is not sent again tomorrow. Several rows are fine and all go in one email / one WhatsApp message. A row with no link and no note is ignored. A member with nothing for today is skipped.
+3. Around 9 AM Dubai (within the hour), open the **`WhatsApp Queue`** tab (you also get an email digest with the same links). For each row tap **Send on WhatsApp**: WhatsApp opens with that person's message ready, you press send. Type `x` in "Sent?" when done. The row's Delivery status is `WHATSAPP_QUEUED`.
+4. Check **Delivery status** in `Responses` the next morning.
 
-**Test safely first:** run `remindersDryRun` or `dailyDryRun` from the editor. They only write to the Execution log (who WOULD get an email) and send nothing. A row whose name is `TEST`, or whose email ends in `.invalid` / `@example.com`, is saved but never emailed.
+**What each trigger does:**
+- **`onSheetEdit`** (when you edit the sheet): if you changed the Payment status column, it sends any pending Welcome emails.
+- **`hourlyTasks`** (every hour): sends any pending Welcome (for example if the quota ran out earlier, or you edited from the phone app). Plus the optional reminder when it is switched on.
+- **`sendDailyContent`** (daily, 9 AM Dubai hour): for each row with Payment status `PAID`, for 30 days from the **Content start date**: emails (Email / Both) and adds to the WhatsApp queue (WhatsApp / Both). It first sends any pending Welcome, so a person you marked PAID at 8:55 still gets Welcome then day 1. Anyone already delivered today is skipped, so re-running is safe.
 
-**Tuning (top of `apps-script.gs`):** `DAILY_HOUR` (9), `TZ` (`Asia/Dubai`), `SPRINT_DAYS` (30), `REMINDER_AFTER_HOURS` (24), `REMINDER_MAX_AGE_DAYS` (7), `QUOTA_RESERVE` (10), `SKIP_EMAIL_IF_WHATSAPP_ONLY` (false). After changing `DAILY_HOUR` or `TZ`, run `setupTriggers` again. To switch automation off: run `removeTriggers`.
+**Test safely first:** run `dailyDryRun` or `welcomesDryRun` from the editor. They only write to the Execution log (who WOULD get something) and send nothing. A row whose name is `TEST`, or whose email ends in `.invalid` / `@example.com`, is saved but never emailed or queued.
+
+**Tuning (top of `apps-script.gs`):** `DAILY_HOUR` (9), `TZ` (`Asia/Dubai`), `SPRINT_DAYS` (30), `SEND_CLAIM_NOTE`, `SEND_OWNER_DIGEST`, `SEND_PAYMENT_REMINDER`, `REMINDER_AFTER_HOURS`, `REMINDER_MAX_AGE_DAYS`, `QUOTA_RESERVE` (10). After changing `DAILY_HOUR` or `TZ`, run `setupTriggers` again. To switch automation off: run `removeTriggers`.
 
 **Honest limits of the automation:**
-- Google's daily trigger runs **sometime within the 9:00 to 10:00 hour** (Dubai), not at exactly 9:00:00. The hourly reminder also drifts within its hour.
-- If a daily run fails or the quota is used up, that day is **not retried** automatically (the sheet says `CONTENT_NOT_SENT`). Run `sendDailyContent` by hand from the editor if that happens: it never double-sends the same day.
-- The script sends **email only**. It cannot send WhatsApp. If someone chose WhatsApp only, either send by hand or set `SKIP_EMAIL_IF_WHATSAPP_ONLY = true` (their status then says `WHATSAPP_MANUAL`).
-- Free Gmail limit is about **100 emails a day** (Workspace about 1,500). Each person costs one email a day, plus confirmations and your own notices, so about 70 active members is the practical ceiling on a free account. The script stops at `QUOTA_RESERVE` left and logs it.
-- The page cannot verify payments, so `PAID` is always your decision. `PAID_CLAIMED` does not start the daily emails.
+- Google's daily trigger runs **sometime within the 9:00 to 10:00 hour** (Dubai), not at exactly 9:00:00.
+- **WhatsApp cannot be sent by a script.** The queue gives you the ready message and a one-tap link; you still press send in WhatsApp for each person. That is a few seconds each, but it is manual. (Fully automatic WhatsApp needs the paid WhatsApp Business API.)
+- If a daily run fails or the email quota is used up, that day is **not retried automatically** (the sheet says `CONTENT_NOT_SENT`). Run `sendDailyContent` by hand from the editor: it never double-sends the same day. WhatsApp queueing does not use email quota.
+- Free Gmail limit is about **100 emails a day** (Workspace about 1,500). Email-channel members cost one email a day each, plus Welcomes, confirmations and your own notices, so about 70 active email members is the practical ceiling on a free account. The script keeps `QUOTA_RESERVE` free and logs it.
+- The page cannot verify payments, so `PAID` is always your decision. `PAID_CLAIMED` only sends the short "confirming" note and does not start anything.
+- If a Welcome email fails for a reason other than quota (bad address), **Welcome sent** shows `FAILED ...` and it is not retried every hour. Fix the email and clear that cell to retry.
+- The on-edit trigger fires when you type in the sheet, not when a script changes a cell. Edits made from the Sheets mobile app also fire it; the hourly trigger is the backup either way.
 - Automatic emails can land in spam or Promotions, especially the first ones.
 - Time-driven triggers need the one-time authorization above. If you change the Google account that owns the script, run `setupTriggers` again.
 
 ## What you see in the sheet (`Responses` tab)
 One row per signup, with every questionnaire answer, plus:
 - **Payment status:** `PENDING` (signed up) > `LINK_OPENED` (opened the payment link) > `PAID_CLAIMED` (said they paid. Not verified) > **`PAID`** (you set this by hand after you see the payment in Razorpay).
-- **Delivery status:** the latest thing the script did for that row: `CONFIRMATION_SENT`, `WELCOME_SENT`, `REMINDER_SENT`, `CONTENT_SENT day 5/30`, `SPRINT_COMPLETE (30 days)`, `TEST_ROW_NO_EMAIL`, or a problem such as `EMAIL_FAILED: ...`, `REMINDER_FAILED: ...`, `CONTENT_NOT_SENT: daily quota used up`.
+- **Delivery status:** the latest thing the script did for that row: `CONFIRMATION_SENT`, `CLAIM_NOTE_SENT`, `WELCOME_SENT`, `CONTENT_SENT day 5/30`, `WHATSAPP_QUEUED day 5/30` (both channels show both, separated by `;`), `SPRINT_COMPLETE (30 days)`, `TEST_ROW_NO_EMAIL`, or a problem such as `EMAIL_FAILED: ...`, `CONTENT_NOT_SENT: daily quota used up`, `WHATSAPP_NOT_QUEUED: invalid number`.
 - **Owner notified:** `OWNER_EMAIL_SENT` when you got the "new signup" / "payment claimed" email.
-- **Reminder sent:** the time the one payment reminder went out (`FAILED ...` if Google rejected the address). Empty = not sent yet.
+- **Welcome sent:** the time the Welcome email went out (once only; `FAILED ...` or `SKIPPED ...` when it could not be sent). Empty = not welcomed yet.
+- **Reminder sent:** only used if you switch the optional reminder on.
 - **Content start date / Last content sent / Content days sent:** filled by the script (see step 4). You may type a start date (`2026-10-20`) to start someone on a chosen day.
-- **Delivery channel:** where they want the daily content (WhatsApp, Email or Both). The script can only send email. WhatsApp content you send by hand.
+- **Delivery channel:** where they want the daily content (WhatsApp, Email or Both). Email is sent by the script; WhatsApp goes to the `WhatsApp Queue` tab for you to send with one tap (a script cannot send WhatsApp).
 
 New columns are added automatically at the end of an existing sheet when the new script runs. Do not rename the header cells in row 1: the script finds columns by their names (you may reorder or hide columns).
 
