@@ -1,15 +1,15 @@
 # RealtorOne Content Sprint: setup (free, about 15 minutes)
 
-The page is one file, `index.html`. No server needed. **It works as it is in preview mode:** with `SUBMIT_ENDPOINT` and `PAYMENT_URL` empty, answers are saved in the browser only (localStorage), the payment step shows a clearly marked "preview" box, and no email or message is sent.
+The page is one file, `index.html`. No server needed. **Until you set `SUBMIT_ENDPOINT` it runs in preview mode:** answers are saved in the browser only (localStorage) and no email or message is sent. `PAYMENT_URL` is already set, so the Pay button opens the real Razorpay link.
 
 Live page: https://anatomyofacloser-cyber.github.io/realtorone-content-sprint/
 
-There are 3 things to switch on. Do them in this order.
+There are 3 things to look at. Only step 1 still needs you.
 
 ## 1. Save signups in a Google Sheet and send the emails (Apps Script)
 1. Create a new Google Sheet with the Gmail account you want the emails to come from. Name it "Content Sprint signups".
 2. Open **Extensions > Apps Script**. Delete the sample code, paste everything from `apps-script.gs`, and save.
-3. At the top of the script, check the config: `WHATSAPP_NUMBER` is already set. Leave `PAYMENT_URL` empty for now (you will add it in step 2). `OWNER_EMAIL` can stay empty: new-signup notices then go to the Gmail account that owns the sheet.
+3. At the top of the script, check the config: `WHATSAPP_NUMBER` is already set. `PAYMENT_URL` is already set. `OWNER_EMAIL` can stay empty: new-signup notices then go to the Gmail account that owns the sheet.
 4. Optional test: pick the function `testEmailsToMe`, click **Run**, approve the permissions. You get a sample confirmation email and a sample welcome email in your own inbox. The Execution log shows `CONFIRMATION_SENT / WELCOME_SENT`.
 5. Click **Deploy > New deployment**, type **Web app**. Execute as: **Me**. Who has access: **Anyone**. Click **Deploy** and approve (the script needs your sheet and permission to send email as you).
 6. Copy the **Web app URL** (ends in `/exec`) and paste it into `index.html`, at the top of the `<script>`:
@@ -20,7 +20,9 @@ There are 3 things to switch on. Do them in this order.
 
 If you edit `apps-script.gs` later: paste it over the old one, save, then **Deploy > Manage deployments > pencil > Version: New version > Deploy**. The `/exec` URL stays the same.
 
-## 2. Add the Razorpay payment link (AED 400)
+## 2. Razorpay payment link (AED 400): already set
+`PAYMENT_URL` is **already set** to `https://rzp.io/rzp/ZRf2Lllg` in both `index.html` and `apps-script.gs`. If you ever need a new link, the steps below show how to create one and where to paste it.
+
 1. Log in to the Razorpay Dashboard. **The account must accept AED:** go to **Settings > Payment Methods > International Payments** and request it if it is not on yet. Razorpay may ask for documents and takes a little time to approve. AED is on Razorpay's supported-currency list for Payment Links.
 2. Go to **Payment Links > Create Payment Link**.
 3. Choose **AED** in the currency dropdown and enter **400** as the amount. If you do not see AED in the dropdown, international payments are not active yet. Ask Razorpay support.
@@ -30,22 +32,22 @@ If you edit `apps-script.gs` later: paste it over the old one, save, then **Depl
    - `index.html`: `var PAYMENT_URL = "https://rzp.io/...";`
    - `apps-script.gs`: `var PAYMENT_URL = 'https://rzp.io/...';` (used for the "Secure my spot" button in the confirmation email). Then redeploy the script as a new version.
 
-When `PAYMENT_URL` is empty the page shows "preview: the payment link isn't set yet" and no real payment can happen.
+(If you clear `PAYMENT_URL`, the page goes back to preview.) When `PAYMENT_URL` is empty the page shows "preview: the payment link isn't set yet" and no real payment can happen.
 
 **Important:** the page cannot see whether someone really paid. "I've completed my payment" (or `?paid=1`) only marks the row **PAYMENT_CLAIMED** and emails you. **Always check the payment in Razorpay before you start someone's content.**
 
 ## 3. Check the other settings (top of the `<script>` in `index.html`)
 ```js
 var SUBMIT_ENDPOINT = "";   // step 1
-var PAYMENT_URL     = "";   // step 2
+var PAYMENT_URL     = "https://rzp.io/rzp/ZRf2Lllg";   // step 2: already set
 var WHATSAPP_NUMBER = "917302317285";   // digits with country code. Empty = WhatsApp buttons hidden
 var CURRENCY        = "AED";
 var PRICE           = 400;
-var REGULAR_PRICE   = "";   // optional, e.g. "590–690": shows "Regular price later: AED 590–690". Empty = hidden
+var REGULAR_PRICE   = 610;  // shown struck through next to the founding price AED 400. Empty = hidden
 var SPOTS           = 10;
 ```
-- `REGULAR_PRICE` is empty on purpose. Fill it only when you have decided the real later price.
-- If you change `CURRENCY`, `PRICE` or the WhatsApp number, change the same lines at the top of `apps-script.gs` too.
+- `REGULAR_PRICE` is 610: the page shows "Regular price ~~AED 610~~" and "Founding offer — you get it for AED 400". Make it empty to show only AED 400.
+- If you change `CURRENCY`, `PRICE`, `REGULAR_PRICE` or the WhatsApp number, change the same lines at the top of `apps-script.gs` too.
 - Empty values hide their button/line. WhatsApp buttons appear on the payment step and the welcome screen.
 
 ## What you see in the sheet (`Responses` tab)

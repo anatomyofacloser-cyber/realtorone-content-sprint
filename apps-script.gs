@@ -17,11 +17,12 @@
 
 /* ===== CONFIG: keep in step with index.html ===== */
 var PAGE_URL        = 'https://anatomyofacloser-cyber.github.io/realtorone-content-sprint/';
-var PAYMENT_URL     = '';          // same Razorpay Payment Link as in index.html. Empty = no pay button in the email
+var PAYMENT_URL     = 'https://rzp.io/rzp/ZRf2Lllg';   // same Razorpay Payment Link as in index.html. Empty = no pay button in the email
 var WHATSAPP_NUMBER = '917302317285';   // digits with country code. Empty = no WhatsApp line in the emails
 var OWNER_EMAIL     = '';          // who gets the "new signup" emails. Empty = the Gmail account that owns this sheet
 var CURRENCY        = 'AED';
 var PRICE           = 400;
+var REGULAR_PRICE   = 610;         // same as index.html. Empty = the regular price is not mentioned in emails
 var SENDER_NAME     = 'RealtorOne Content Sprint';
 /* ================================================ */
 
@@ -190,6 +191,11 @@ function sendWelcomeEmail(s) {
 }
 
 function money() { return CURRENCY + ' ' + PRICE; }
+function regularMoney() { return REGULAR_PRICE ? CURRENCY + ' ' + REGULAR_PRICE : ''; }
+/* "Founding offer: you get it for AED 400 / 30 days (regular price AED 610)" */
+function offerLine() {
+  return 'Founding offer: you get it for ' + money() + ' / 30 days' + (regularMoney() ? ' (regular price ' + regularMoney() + ')' : '') + '.';
+}
 function waUrl() { var d = String(WHATSAPP_NUMBER || '').replace(/\D/g, ''); return d ? 'https://wa.me/' + d : ''; }
 function firstName(n) { return plain(n, 40).split(' ')[0] || 'there'; }
 
@@ -199,7 +205,7 @@ function confirmationText(s) {
     'WHAT WE NOTED',
     'Area: ' + s.areas, 'Property: ' + s.types, 'Focus: ' + s.deal, 'Content sent via: ' + s.channel, '',
     'NEXT STEP',
-    'Secure your founding spot (' + SPOTS_TEXT() + ') for ' + money() + ' / 30 days.'];
+    'Secure your founding spot (' + SPOTS_TEXT() + ').', offerLine()];
   if (PAYMENT_URL) { L.push('Pay here: ' + PAYMENT_URL); } else { L.push('Go back to the page and tap "Secure my spot": ' + PAGE_URL); }
   L.push('', 'WHAT YOU GET', 'Every morning at 9 AM Dubai time: 2 static posts + 3 carousels, captions included.',
     '30 days x 5 posts/day = 150 pieces of content.', '',
@@ -269,8 +275,9 @@ function confirmationHtml(s) {
       ePara('Thanks for completing the Content Sprint onboarding. We have your details and will build your content around them.'), '32px 32px 8px') +
     eRow(eLabel('What we noted') + eDetails([['Area', s.areas], ['Property', s.types], ['Focus', s.deal], ['Content sent via', s.channel]]), '8px 32px 20px') +
     eRow(eLabel('Next step') +
-      ePara('Secure your founding spot (' + SPOTS_TEXT() + ') for ' + money() + ' / 30 days.') +
-      (PAYMENT_URL ? eButton(PAYMENT_URL, 'Secure my spot: ' + money()) : eButton(PAGE_URL, 'Back to the page')) +
+      ePara('Secure your founding spot (' + SPOTS_TEXT() + ').') +
+      '<p style="margin:0 0 12px;font-family:' + EM.sans + ';font-size:16px;line-height:25px;color:' + EM.ink + ';">Founding offer: you get it for <b>' + esc(money()) + '</b> / 30 days' + (regularMoney() ? ' <span style="color:' + EM.muted + ';">(regular price <span style="text-decoration:line-through;">' + esc(regularMoney()) + '</span>)</span>' : '') + '.</p>' +
+      (PAYMENT_URL ? eButton(PAYMENT_URL, 'Secure my spot for ' + money()) : eButton(PAGE_URL, 'Back to the page')) +
       '<p style="margin:12px 0 0;font-family:' + EM.sans + ';font-size:14px;line-height:21px;color:' + EM.ink + ';">Every morning at 9 AM Dubai time: 2 static posts + 3 carousels, captions included. 30 days &times; 5 posts/day = 150 pieces of content.</p>' +
       '<p style="margin:10px 0 0;font-family:' + EM.sans + ';font-size:12px;line-height:18px;color:' + EM.muted + ';">Content keeps you visible. It does not guarantee leads or deals.</p>' + eWa(), '8px 32px 26px');
   return eShell('We have your Content Sprint details. One step left: secure your spot.', 'Your Content Sprint spot request', rows);

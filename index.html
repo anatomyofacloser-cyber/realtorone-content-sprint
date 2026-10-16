@@ -66,8 +66,9 @@ em{font-family:var(--serif);font-style:italic;font-size:1.06em}
 .price .row{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
 .price .amt{font-family:var(--serif);font-variant-numeric:lining-nums;font-size:50px;font-weight:600;line-height:1;color:var(--text)}
 .price .per{font-size:15px;color:var(--muted)}
-.price .reg{font-size:13.5px;color:var(--muted);margin:6px 0 0}
-.price .reg s{text-decoration-thickness:1.5px}
+.was{font-size:15px;color:var(--muted);margin:2px 0 6px}
+.was s{font-family:var(--serif);font-variant-numeric:lining-nums;font-size:24px;font-weight:500;color:#C9C2B3;text-decoration-thickness:2px;text-decoration-color:var(--err);margin-left:4px}
+.gets{font-size:15px;font-weight:600;color:var(--amber);margin:8px 0 0}
 .badge{display:inline-block;background:rgba(217,164,65,.16);color:var(--amber);font-size:12.5px;font-weight:600;padding:5px 11px;border-radius:999px;margin:0 0 12px}
 .price .fine{font-size:13.5px;color:#DCD6C8;margin:10px 0 0}
 .quick{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0;padding:0;list-style:none}
@@ -106,8 +107,8 @@ em{font-family:var(--serif);font-style:italic;font-size:1.06em}
 .steps li{counter-increment:s;position:relative;padding:0 0 14px 40px;font-size:15.5px;color:#DCD6C8}
 .steps li::before{content:counter(s);position:absolute;left:0;top:-1px;width:28px;height:28px;border-radius:50%;border:1px solid var(--amber);display:grid;place-items:center;font-family:var(--serif);font-size:16px;color:var(--amber)}
 .steps li b{color:var(--text);font-weight:500}
-.quote{font-family:var(--serif);font-style:italic;font-size:24px;line-height:1.25;color:var(--text);margin:22px 0 0;padding-left:16px;border-left:2px solid var(--amber)}
-.disc{font-size:12.5px;color:var(--muted);margin:14px 0 0}
+.sec p.quote,.quote{font-family:var(--serif);font-style:italic;font-size:24px;line-height:1.25;color:var(--text);margin:22px 0 0;padding-left:16px;border-left:2px solid var(--amber)}
+.sec p.disc,.disc{font-size:12.5px;color:var(--muted);margin:14px 0 0}
 .sticky{position:sticky;bottom:0;z-index:5;margin:18px -22px 0;padding:22px 22px calc(12px + env(safe-area-inset-bottom));background:linear-gradient(180deg,rgba(16,26,46,0),rgba(16,26,46,.94) 40%)}
 .sticky .btn{box-shadow:0 10px 30px -8px rgba(0,0,0,.6),0 8px 26px -10px rgba(217,164,65,.55)}
 
@@ -213,8 +214,9 @@ footer.foot span{color:var(--text)}
 
       <div class="price" id="priceBox">
         <span class="badge">Founding offer</span>
+        <div class="was" id="regLine" hidden></div>
         <div class="row"><span class="amt" id="priceAmt">AED 400</span><span class="per">/ 30 days</span></div>
-        <p class="reg" id="regLine" hidden></p>
+        <p class="gets" id="getsLine" hidden></p>
         <p class="fine" id="spotsLine">Only 10 founding spots from this Live Lab. Each realtor’s content is personalised around their market, specialization and personal brand.</p>
       </div>
       <ul class="quick" aria-label="Highlights">
@@ -277,7 +279,7 @@ footer.foot span{color:var(--text)}
         <h2 id="spotsH">We are opening 10 Content Sprint spots for today’s Live Lab attendees.</h2>
         <p style="margin-top:12px">If you want to stop worrying about what to post every morning, complete the short onboarding form.</p>
         <p>We’ll understand your market, specialization and personal brand first. Then we’ll show you exactly what your content will look like.</p>
-        <p>If you like it, secure your spot for <b id="priceInline">AED 400</b>.</p>
+        <p>If you like it, secure your spot for <b id="priceInline">AED 400</b><span id="priceInlineReg"></span>.</p>
         <ol class="steps">
           <li><b>Claim your spot.</b> Name, email, WhatsApp.</li>
           <li><b>Tell us about your business.</b> A 5–10 minute questionnaire.</li>
@@ -286,7 +288,7 @@ footer.foot span{color:var(--text)}
         </ol>
       </div>
 
-      <div class="sticky"><button class="btn" id="claimBtn" type="button">Claim your spot</button></div>
+      <div class="sticky"><button class="btn" id="claimBtn" type="button">Claim your spot · AED 400</button></div>
     </section>
 
     <!-- 2. CLAIM -->
@@ -460,8 +462,9 @@ footer.foot span{color:var(--text)}
       <p class="fsub" id="paySub">One of 10 founding Content Sprint spots.</p>
       <div class="paycard">
         <span class="badge">Founding offer</span>
+        <div class="was" id="payReg" hidden></div>
         <div><span class="amt" id="payAmt">AED 400</span><span class="per">/ 30 days</span></div>
-        <p class="reg" id="payReg" hidden style="margin:6px 0 0;font-size:13.5px;color:var(--muted)"></p>
+        <p class="gets" id="payGets" hidden></p>
         <ul class="checks">
           <li>Ready-to-post content every morning, 9 AM Dubai time</li>
           <li>2 static + 3 carousels a day, captions included</li>
@@ -509,11 +512,11 @@ footer.foot span{color:var(--text)}
 "use strict";
 /* ===== CONFIG ===== */
 var SUBMIT_ENDPOINT = "";   // Google Apps Script web app URL (ends in /exec). Empty = save to localStorage only (preview mode).
-var PAYMENT_URL     = "";   // Razorpay Payment Link for AED 400. Empty = clearly marked preview, no real payment.
+var PAYMENT_URL     = "https://rzp.io/rzp/ZRf2Lllg";   // Razorpay Payment Link for AED 400. Empty = clearly marked preview, no real payment.
 var WHATSAPP_NUMBER = "917302317285";   // digits with country code. Empty = WhatsApp buttons hidden
 var CURRENCY        = "AED";
 var PRICE           = 400;  // founding price for 30 days
-var REGULAR_PRICE   = "";   // optional, e.g. "590–690". Owner must confirm first. Empty = hidden
+var REGULAR_PRICE   = 610;  // regular price, shown struck through next to the founding price. Empty = hidden
 var SPOTS           = 10;   // founding spots, mentioned in the pitch text
 /* ================== */
 
@@ -535,8 +538,12 @@ function money(n){ return CURRENCY+" "+n; }
   $("payPreviewBtn").textContent = "Pay "+money(PRICE)+" (preview only)";
   $("spotsLine").textContent = "Only "+SPOTS+" founding spots from this Live Lab. Each realtor’s content is personalised around their market, specialization and personal brand.";
   $("spotsH").textContent = "We are opening "+SPOTS+" Content Sprint spots for today’s Live Lab attendees.";
+  $("claimBtn").textContent = "Claim your spot · "+money(PRICE);
   if(REGULAR_PRICE){
-    ["regLine","payReg"].forEach(function(id){ var e=$(id); e.hidden=false; e.innerHTML = "Regular price later: <s>"+esc(CURRENCY+" "+REGULAR_PRICE)+"</s>"; });
+    ["regLine","payReg"].forEach(function(id){ var e=$(id); e.hidden=false; e.innerHTML = "Regular price <s>"+esc(money(REGULAR_PRICE))+"</s>"; });
+    ["getsLine","payGets"].forEach(function(id){ var e=$(id); e.hidden=false; e.textContent = "Founding offer — you get it for "+money(PRICE); });
+    $("priceInline").textContent = money(PRICE);
+    $("priceInlineReg").textContent = " (regular price "+money(REGULAR_PRICE)+")";
   }
 })();
 
