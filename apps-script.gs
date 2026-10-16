@@ -17,6 +17,7 @@
 
 /* ===== CONFIG: keep in step with index.html ===== */
 var PAGE_URL        = 'https://anatomyofacloser-cyber.github.io/realtorone-content-sprint/';
+var LOGO_URL        = PAGE_URL + 'logo.png';   // The Realtor One logo, served by GitHub Pages. Empty = emails have no logo
 var PAYMENT_URL     = 'https://rzp.io/rzp/ZRf2Lllg';   // same Razorpay Payment Link as in index.html. Empty = no pay button in the email
 var WHATSAPP_NUMBER = '917302317285';   // digits with country code. Empty = no WhatsApp line in the emails
 var OWNER_EMAIL     = '';          // who gets the "new signup" emails. Empty = the Gmail account that owns this sheet
@@ -251,10 +252,13 @@ function eShell(preheader, title, rows) {
   h += '<div style="display:none;max-height:0;overflow:hidden;opacity:0;color:#ebe5d8;font-size:1px;line-height:1px;">' + esc(preheader) + '</div>';
   h += '<table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="background:#ebe5d8;"><tr><td align="center" style="padding:20px 10px;">';
   h += '<table role="presentation" width="600" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:600px;border-radius:12px;overflow:hidden;">';
-  h += '<tr><td style="background:' + EM.charcoal + ';padding:30px 32px 28px;">' +
-    '<div style="font-family:' + EM.sans + ';font-size:12px;line-height:18px;letter-spacing:4px;text-transform:uppercase;font-weight:600;color:' + EM.cream + ';">RealtorOne Content Sprint</div>' +
-    '<div style="height:2px;width:36px;background:' + EM.accent + ';font-size:1px;line-height:2px;margin:14px 0 14px;">&nbsp;</div>' +
-    '<div style="font-family:' + EM.serif + ';font-style:italic;font-size:17px;line-height:25px;color:#cfc8b8;">Never wonder what to post again.</div></td></tr>';
+  var logo = LOGO_URL
+    ? '<td width="72" valign="middle" style="padding:0 16px 0 0;"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr><td style="background:#ffffff;border-radius:10px;padding:5px 7px;"><img src="' + esc(LOGO_URL) + '" width="52" alt="The Realtor One" style="display:block;width:52px;height:auto;border:0;"></td></tr></table></td>'
+    : '';
+  h += '<tr><td style="background:' + EM.charcoal + ';padding:26px 32px 24px;"><table role="presentation" cellpadding="0" cellspacing="0" border="0"><tr>' + logo +
+    '<td valign="middle"><div style="font-family:' + EM.sans + ';font-size:12px;line-height:18px;letter-spacing:4px;text-transform:uppercase;font-weight:600;color:' + EM.cream + ';">RealtorOne Content Sprint</div>' +
+    '<div style="height:2px;width:36px;background:' + EM.accent + ';font-size:1px;line-height:2px;margin:10px 0 10px;">&nbsp;</div>' +
+    '<div style="font-family:' + EM.serif + ';font-style:italic;font-size:17px;line-height:23px;color:#e0b865;">Invisible Habits. Visible Results.</div></td></tr></table></td></tr>';
   h += rows;
   h += '<tr><td align="center" style="background:' + EM.cream + ';padding:14px 32px 30px;"><div style="font-family:' + EM.sans + ';font-size:12px;line-height:18px;color:' + EM.muted + ';">A RealtorOne project &middot; You&rsquo;re receiving this because you signed up for the Content Sprint.</div></td></tr>';
   return h + '</table></td></tr></table></body></html>';

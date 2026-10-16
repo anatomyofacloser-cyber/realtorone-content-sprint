@@ -64,5 +64,10 @@ One row per signup, with every questionnaire answer, plus:
 - No trackers or analytics. The only outside request is the Google Fonts stylesheet; the page works without it.
 - The example posts on step 3 are samples built from the person's answers. They use `[bracketed]` placeholders, never invented figures. Keep it that way if you edit the text in `buildSamples()` in `index.html`.
 
+## Logo, popup and poster
+- `logo.png` (optimised, white background) is the header logo, favicon source and email logo. Emails load it from `PAGE_URL + 'logo.png'` (top of `apps-script.gs`), so keep the file in the repo.
+- When the page opens, a poster popup explains the offer. It shows once per browser session. Its prices follow `PRICE`, `REGULAR_PRICE` and `SPOTS` in `index.html`. People with "reduce motion" turned on see a still poster.
+- `poster.png` (1080 × 1620) is the same poster as a shareable image for WhatsApp and Pinterest. `poster-share.jpg` is the link preview image. If you change prices, re-export the poster.
+
 ## Hosting
 Already published with GitHub Pages (branch `main`, folder `/`). To update the page: edit `index.html` and push to `main`; the live page refreshes in about a minute. `.nojekyll` is included.

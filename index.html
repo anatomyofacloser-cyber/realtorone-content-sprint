@@ -6,11 +6,15 @@
 <title>RealtorOne Content Sprint | Never wonder what to post again</title>
 <meta name="description" content="Every morning at 9 AM Dubai time, ready-to-post content built around your market, specialization and personal brand. 30 days. 150 pieces of content.">
 <meta name="theme-color" content="#0B1220">
+<link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
 <meta property="og:type" content="website">
 <meta property="og:title" content="RealtorOne Content Sprint | Never wonder what to post again">
 <meta property="og:description" content="Ready-to-post Dubai real-estate content every morning at 9 AM. 30 days. 150 pieces of content.">
 <meta property="og:site_name" content="RealtorOne Content Sprint">
-<meta name="twitter:card" content="summary">
+<meta property="og:image" content="https://anatomyofacloser-cyber.github.io/realtorone-content-sprint/poster-share.jpg">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://anatomyofacloser-cyber.github.io/realtorone-content-sprint/poster-share.jpg">
 <meta name="twitter:title" content="RealtorOne Content Sprint | Never wonder what to post again">
 <meta name="twitter:description" content="Ready-to-post Dubai real-estate content every morning at 9 AM. 30 days. 150 pieces of content.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -188,6 +192,95 @@ select.inp{background-image:linear-gradient(45deg,transparent 50%,var(--muted) 5
 .wrap{margin:20px 0;border:1px solid var(--amber);border-radius:16px;padding:16px;background:rgba(217,164,65,.09);font-family:var(--serif);font-size:24px;line-height:1.2;text-align:center}
 .wrap small{display:block;font-family:var(--sans);font-size:12px;letter-spacing:.1em;text-transform:uppercase;color:var(--amber);margin:0 0 6px;font-weight:600}
 .pbanner{font-size:12.5px;color:var(--err);border:1px dashed var(--err);border-radius:10px;padding:8px 12px;margin:0 0 16px}
+
+/* header logo */
+.logotile{flex:none;display:grid;place-items:center;background:#fff;border-radius:10px;padding:4px 5px;box-shadow:0 4px 14px -6px rgba(0,0,0,.6)}
+.logotile img{display:block;height:50px;width:auto}
+.btag{font-family:var(--serif);font-style:italic;font-weight:500;font-size:17px;line-height:1.1;color:var(--amber);letter-spacing:.005em}
+.brand{gap:11px}
+@media (max-width:359px){.header-tag,.top .tag{display:none}.btag{font-size:16px}}
+
+/* poster popup */
+.pop{position:fixed;inset:0;z-index:50;display:none;overflow-y:auto;-webkit-overflow-scrolling:touch;padding:12px;background:rgba(4,8,16,.82);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);overscroll-behavior:contain}
+.pop.open{display:flex;animation:popbg .3s ease both}
+@keyframes popbg{from{opacity:0}to{opacity:1}}
+.pop .dlg{margin:auto;width:min(380px,calc(100vw - 24px),max(288px,calc((100vh - 190px)/1.5)));width:min(380px,calc(100vw - 24px),max(288px,calc((100dvh - 190px)/1.5)));position:relative;animation:popin .45s cubic-bezier(.2,.8,.2,1) both}
+@keyframes popin{from{opacity:0;transform:translateY(24px) scale(.96)}to{opacity:1;transform:none}}
+.pop .x{position:absolute;top:8px;right:8px;z-index:3;width:44px;height:44px;border-radius:50%;border:1px solid rgba(242,235,221,.35);background:rgba(11,18,32,.72);color:var(--text);font:400 24px/1 var(--sans);cursor:pointer;display:grid;place-items:center;padding:0}
+.pop .x:hover{background:rgba(11,18,32,.92)}
+.pop .acts{margin-top:12px}
+.pop .acts .btn{box-shadow:0 10px 30px -8px rgba(0,0,0,.6),0 8px 26px -10px rgba(217,164,65,.55)}
+.pop .acts .link{display:block;margin:2px auto 0;color:#C7CFDD}
+body.lock{overflow:hidden}
+
+/* poster: 1u = 1% of its width. Base state = final state (what reduced-motion users see). */
+.poster{--u:3.4px;container-type:inline-size;position:relative;width:100%;aspect-ratio:2/3;overflow:hidden;border-radius:calc(var(--u)*4.2);color:var(--text);font-family:var(--sans);
+  background:radial-gradient(ellipse 90% 45% at 50% -8%,rgba(217,164,65,.30),transparent 70%),radial-gradient(ellipse 70% 40% at 100% 100%,rgba(217,164,65,.14),transparent 70%),linear-gradient(170deg,#142544,#0B1220 62%);
+  border:1px solid rgba(217,164,65,.45);box-shadow:0 30px 60px -20px rgba(0,0,0,.8)}
+@supports (width:1cqw){.poster{--u:1cqw}}
+.poster *{box-sizing:border-box}
+.poster .pin{position:absolute;inset:calc(var(--u)*5.5) calc(var(--u)*6.5) calc(var(--u)*5);display:flex;flex-direction:column}
+.poster .ptop{display:flex;align-items:center;gap:calc(var(--u)*4.5)}
+.poster .plogo{flex:none;background:#fff;border-radius:calc(var(--u)*2.6);padding:calc(var(--u)*1.4) calc(var(--u)*1.8);box-shadow:0 calc(var(--u)*1) calc(var(--u)*3) rgba(0,0,0,.45)}
+.poster .plogo img{display:block;height:calc(var(--u)*15);width:auto}
+.poster .ptag{font-family:var(--serif);font-style:italic;font-weight:500;font-size:calc(var(--u)*6.4);line-height:1.08;color:var(--amber)}
+.poster .peye{margin-top:0;font-size:calc(var(--u)*2.7);letter-spacing:.16em;text-transform:uppercase;color:var(--muted);font-weight:600;margin:0 0 calc(var(--u)*1.6)}
+.poster h2.phead{font-family:var(--serif);font-weight:500;font-size:calc(var(--u)*9.4);line-height:1.02;letter-spacing:-.01em;margin:calc(var(--u)*3.8) 0 calc(var(--u)*3);color:var(--text)}
+.poster h2.phead em{color:var(--amber);font-size:1em}
+.poster .rows{display:flex;flex-direction:column;gap:calc(var(--u)*2);margin-bottom:calc(var(--u)*3)}
+.poster .prow{display:flex;align-items:center;gap:calc(var(--u)*3.6);border:1px solid rgba(242,235,221,.14);background:rgba(255,255,255,.04);border-radius:calc(var(--u)*3);padding:calc(var(--u)*1.7) calc(var(--u)*3.2);min-height:calc(var(--u)*12.4)}
+.poster .pic{flex:none;width:calc(var(--u)*18);display:flex;align-items:center;justify-content:center}
+.poster .pt{min-width:0}
+.poster .pt b{display:block;font-size:calc(var(--u)*4.7);line-height:1.12;font-weight:600;color:var(--text)}
+.poster .pt span{display:block;font-size:calc(var(--u)*3.4);line-height:1.25;color:var(--muted);margin-top:calc(var(--u)*.6)}
+/* clock */
+.poster .clock{position:relative;width:calc(var(--u)*10);height:calc(var(--u)*10);border-radius:50%;border:calc(var(--u)*.6) solid var(--amber);background:rgba(217,164,65,.08)}
+.poster .clock i{position:absolute;left:50%;bottom:50%;width:calc(var(--u)*.7);margin-left:calc(var(--u)*-.35);background:var(--text);border-radius:2px;transform-origin:50% 100%}
+.poster .clock .hh{height:calc(var(--u)*3.4);transform:rotate(270deg)}
+.poster .clock .mm{height:calc(var(--u)*4.6);background:var(--amber);transform:rotate(0deg)}
+.poster .clock b{position:absolute;left:50%;top:50%;width:calc(var(--u)*1.3);height:calc(var(--u)*1.3);margin:calc(var(--u)*-.65) 0 0 calc(var(--u)*-.65);border-radius:50%;background:var(--amber)}
+/* five posts */
+.poster .five{display:flex;gap:calc(var(--u)*1.1);align-items:flex-end}
+.poster .five i{display:block;border-radius:calc(var(--u)*.8);border:calc(var(--u)*.45) solid var(--amber);background:rgba(217,164,65,.18);width:calc(var(--u)*3.3);height:calc(var(--u)*5)}
+.poster .five i.c{background:linear-gradient(90deg,rgba(217,164,65,.45) 35%,rgba(217,164,65,.12) 35%);}
+.poster .count{font-family:var(--serif);font-variant-numeric:lining-nums;font-weight:600;font-size:calc(var(--u)*10.5);line-height:1;color:var(--amber);letter-spacing:-.01em}
+/* offer */
+.poster .offer{margin-top:auto;border:1px solid rgba(217,164,65,.55);border-radius:calc(var(--u)*3.4);background:linear-gradient(180deg,rgba(217,164,65,.17),rgba(217,164,65,.05));padding:calc(var(--u)*2.6) calc(var(--u)*4.2) calc(var(--u)*2.8)}
+.poster .orow{display:flex;align-items:baseline;justify-content:space-between;gap:calc(var(--u)*2)}
+.poster .was{font-size:calc(var(--u)*3.6);color:var(--muted);margin:0}
+.poster .was .strike{font-family:var(--serif);font-size:calc(var(--u)*5.4);font-weight:500;color:#D5CEBF;background:linear-gradient(var(--err),var(--err)) no-repeat 0 56%/100% calc(var(--u)*.55);padding:0 calc(var(--u)*.6)}
+.poster .per{font-size:calc(var(--u)*3.4);color:var(--muted)}
+.poster .now{font-family:var(--serif);font-variant-numeric:lining-nums;font-weight:600;font-size:calc(var(--u)*12.5);line-height:1;color:var(--text);margin:calc(var(--u)*.6) 0 calc(var(--u)*.4);display:inline-block;transform-origin:0 70%}
+.poster .now small{font-size:calc(var(--u)*5);color:var(--amber);margin-right:calc(var(--u)*1.6);letter-spacing:.02em}
+.poster .fo{font-size:calc(var(--u)*3.9);font-weight:600;color:var(--amber);margin:0}
+.poster .dots{display:flex;gap:calc(var(--u)*1.6);margin:calc(var(--u)*1.8) 0 0}
+.poster .dots i{flex:1;height:calc(var(--u)*2.2);border-radius:calc(var(--u)*1.1);background:var(--amber)}
+.poster .spots{font-size:calc(var(--u)*3.2);color:#DCD6C8;margin:calc(var(--u)*1.2) 0 0}
+.poster .pfoot{font-size:calc(var(--u)*2.8);color:var(--muted);text-align:center;margin:calc(var(--u)*2.4) 0 0;letter-spacing:.04em}
+.poster .pbar{position:absolute;left:0;bottom:0;height:calc(var(--u)*.9);width:100%;background:linear-gradient(90deg,var(--amber-d),var(--amber))}
+
+/* ~5 s loop of the poster's beats: 9 AM > 5 posts > 150 pieces > price + spots */
+.poster.play .prow.r1{animation:r1 5s infinite both}
+.poster.play .prow.r2{animation:r2 5s infinite both}
+.poster.play .prow.r3{animation:r3 5s infinite both}
+.poster.play .offer{animation:r4 5s infinite both}
+.poster.play .clock .hh{animation:hand 5s infinite both}
+.poster.play .five i{animation:pop 5s infinite both;animation-delay:calc(var(--i)*.14s)}
+.poster.play .was .strike{animation:strike 5s infinite both}
+.poster.play .now{animation:price 5s infinite both}
+.poster.play .dots i{animation:dot 5s infinite both;animation-delay:calc(var(--i)*.05s)}
+.poster.play .pbar{animation:bar 5s linear infinite both}
+@keyframes r1{0%{border-color:rgba(242,235,221,.14);background:rgba(255,255,255,.04)}3%,22%{border-color:var(--amber);background:rgba(217,164,65,.16)}27%,100%{border-color:rgba(242,235,221,.14);background:rgba(255,255,255,.04)}}
+@keyframes r2{0%,23%{border-color:rgba(242,235,221,.14);background:rgba(255,255,255,.04)}28%,50%{border-color:var(--amber);background:rgba(217,164,65,.16)}55%,100%{border-color:rgba(242,235,221,.14);background:rgba(255,255,255,.04)}}
+@keyframes r3{0%,51%{border-color:rgba(242,235,221,.14);background:rgba(255,255,255,.04)}56%,78%{border-color:var(--amber);background:rgba(217,164,65,.16)}83%,100%{border-color:rgba(242,235,221,.14);background:rgba(255,255,255,.04)}}
+@keyframes r4{0%,78%{box-shadow:0 0 0 0 rgba(217,164,65,0)}84%,97%{box-shadow:0 0 calc(var(--u)*6) calc(var(--u)*.8) rgba(217,164,65,.38)}100%{box-shadow:0 0 0 0 rgba(217,164,65,0)}}
+@keyframes hand{0%,2%{transform:rotate(180deg)}18%,100%{transform:rotate(270deg)}}
+@keyframes pop{0%,24%{opacity:.14;transform:scale(.4)}31%{opacity:1;transform:scale(1.22)}36%,100%{opacity:1;transform:scale(1)}}
+@keyframes strike{0%,80%{background-size:0 calc(var(--u)*.55)}87%,100%{background-size:100% calc(var(--u)*.55)}}
+@keyframes price{0%,80%{transform:scale(1)}85%{transform:scale(1.07)}92%,100%{transform:scale(1)}}
+@keyframes dot{0%,81%{opacity:.18;transform:scaleY(.7)}85%{opacity:1;transform:scaleY(1.4)}90%,100%{opacity:1;transform:scaleY(1)}}
+@keyframes bar{from{transform:scaleX(0)}to{transform:scaleX(1)}}
+.poster .pbar{transform-origin:0 50%}
 footer.foot{padding:18px 0 22px;text-align:center;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);margin-top:6px}
 footer.foot span{color:var(--text)}
 @media (max-width:360px){h1{font-size:40px}.fh h2{font-size:27px}.price .amt{font-size:44px}}
@@ -198,8 +291,8 @@ footer.foot span{color:var(--text)}
 <div class="app">
   <header class="top">
     <div class="brand">
-      <svg viewBox="0 0 24 24" fill="none" stroke="#D9A441" stroke-width="1.4" aria-hidden="true"><circle cx="12" cy="12" r="9.2"/><path d="M12 4.2l2.1 7.8L12 19.8 9.9 12z" fill="rgba(217,164,65,.25)"/><circle cx="12" cy="12" r="1.1" fill="#D9A441" stroke="none"/></svg>
-      RealtorOne
+      <span class="logotile"><img src="logo.png" alt="The Realtor One" width="47" height="50"></span>
+      <span class="btag">Invisible Habits.<br>Visible Results.</span>
     </div>
     <div class="tag">Content Sprint</div>
   </header>
@@ -504,6 +597,49 @@ footer.foot span{color:var(--text)}
   </main>
 
   <footer class="foot"><span>RealtorOne Content Sprint</span> · A RealtorOne project</footer>
+</div>
+
+
+<!-- POSTER POPUP: hidden by default, only opened by JS (never blocks the page) -->
+<div class="pop" id="pop" role="dialog" aria-modal="true" aria-labelledby="pop-h">
+  <div class="dlg" id="popDlg">
+    <button class="x" id="popX" type="button" aria-label="Close">&times;</button>
+    <article class="poster" id="poster">
+      <div class="pin">
+        <div class="ptop">
+          <div class="plogo"><img src="logo.png" alt="The Realtor One"></div>
+          <div><p class="peye">Content Sprint</p><div class="ptag">Invisible Habits.<br>Visible Results.</div></div>
+        </div>
+        <h2 class="phead" id="pop-h">Never wonder what to post <em>again.</em></h2>
+        <div class="rows">
+          <div class="prow r1">
+            <div class="pic" aria-hidden="true"><div class="clock"><i class="mm"></i><i class="hh"></i><b></b></div></div>
+            <div class="pt"><b>9:00 AM daily</b><span>Dubai time, every morning</span></div>
+          </div>
+          <div class="prow r2">
+            <div class="pic" aria-hidden="true"><div class="five"><i style="--i:0"></i><i style="--i:1"></i><i class="c" style="--i:2"></i><i class="c" style="--i:3"></i><i class="c" style="--i:4"></i></div></div>
+            <div class="pt"><b>5 posts a day</b><span>2 static + 3 carousels</span></div>
+          </div>
+          <div class="prow r3">
+            <div class="pic"><div class="count" id="pCount">150</div></div>
+            <div class="pt"><b>30 days = 150 pieces</b><span>30 days × 5 posts a day</span></div>
+          </div>
+        </div>
+        <div class="offer">
+          <div class="orow"><p class="was" id="pWas">Regular price <span class="strike">AED 610</span></p></div>
+          <div><span class="now" id="pNow">AED 400</span> <span class="per">/ 30 days</span></div>
+          <p class="fo">Founding offer — you get it for <span id="pNow2">AED 400</span></p>
+          <div class="dots" aria-hidden="true"><i style="--i:0"></i><i style="--i:1"></i><i style="--i:2"></i><i style="--i:3"></i><i style="--i:4"></i><i style="--i:5"></i><i style="--i:6"></i><i style="--i:7"></i><i style="--i:8"></i><i style="--i:9"></i></div>
+          <p class="spots" id="pSpots">Only 10 founding spots from this Live Lab.</p>
+        </div>
+      </div>
+      <div class="pbar" aria-hidden="true"></div>
+    </article>
+    <div class="acts">
+      <button class="btn" id="popGo" type="button">Claim your spot</button>
+      <button class="link" id="popMore" type="button">See the details first</button>
+    </div>
+  </div>
 </div>
 
 <noscript><p style="max-width:480px;margin:0 auto;padding:0 22px;color:#F0A08A">This page needs JavaScript to show the form.</p></noscript>
@@ -878,6 +1014,77 @@ try{
     try{ history.replaceState({s:"welcome",p:0},"",location.pathname); }catch(_){}
   }
 }catch(_){}
+
+/* ---------- poster popup (shown once per session; never blocks the page) ---------- */
+(function(){
+  var pop = $("pop"), dlg = $("popDlg"), poster = $("poster"), app = document.querySelector(".app");
+  if(!pop) return;
+  var lastFocus = null, raf = 0, memSeen = false;
+  var reduce = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+
+  /* prices on the poster follow the config */
+  $("pNow").textContent = money(PRICE); $("pNow2").textContent = money(PRICE);
+  if(REGULAR_PRICE){ $("pWas").innerHTML = "Regular price <span class=\"strike\">"+esc(money(REGULAR_PRICE))+"</span>"; }
+  else { $("pWas").hidden = true; }
+  $("pSpots").textContent = "Only "+SPOTS+" founding spots from this Live Lab.";
+
+  function seen(){ try{ return sessionStorage.getItem("cs.popupSeen")==="1"; }catch(_){ return memSeen; } }
+  function markSeen(){ memSeen = true; try{ sessionStorage.setItem("cs.popupSeen","1"); }catch(_){} }
+
+  function focusables(){
+    return [].filter.call(dlg.querySelectorAll("button,[href],input,select,textarea,[tabindex]:not([tabindex='-1'])"), function(e){ return !e.disabled && e.offsetParent!==null; });
+  }
+  function setCount(v){ $("pCount").textContent = v; }
+  function loop(){
+    var t = 0;
+    try{
+      var bar = poster.querySelector(".pbar"), an = bar.getAnimations && bar.getAnimations()[0];
+      t = an && an.currentTime!=null ? (Number(an.currentTime) % 5000) : (performance.now() % 5000);
+    }catch(_){ t = performance.now() % 5000; }
+    var v = 0;
+    if(t >= 2650){ var k = Math.min(1,(t-2650)/1250); v = Math.round(150*(1-Math.pow(1-k,3))); }
+    if(pop._v !== v){ pop._v = v; setCount(v); }
+    raf = requestAnimationFrame(loop);
+  }
+  function openPop(){
+    if(pop.classList.contains("open")) return;
+    markSeen();
+    lastFocus = document.activeElement;
+    pop.classList.add("open"); document.body.classList.add("lock");
+    try{ app.setAttribute("inert",""); app.setAttribute("aria-hidden","true"); }catch(_){}
+    pop.scrollTop = 0;
+    if(!reduce){ poster.classList.add("play"); pop._v = -1; raf = requestAnimationFrame(loop); }
+    else { poster.classList.remove("play"); setCount(150); }
+    setTimeout(function(){ try{ $("popGo").focus({preventScroll:true}); }catch(_){} }, 60);
+  }
+  function closePop(restore){
+    if(!pop.classList.contains("open")) return;
+    pop.classList.remove("open"); document.body.classList.remove("lock");
+    poster.classList.remove("play"); cancelAnimationFrame(raf); setCount(150);
+    try{ app.removeAttribute("inert"); app.removeAttribute("aria-hidden"); }catch(_){}
+    if(restore!==false && lastFocus && lastFocus.focus){ try{ lastFocus.focus({preventScroll:true}); }catch(_){} }
+  }
+  window.__csPopup = {open:openPop, close:closePop};
+
+  $("popX").addEventListener("click", function(){ closePop(); });
+  $("popMore").addEventListener("click", function(){ closePop(); });
+  $("popGo").addEventListener("click", function(){ closePop(false); show("claim"); });
+  pop.addEventListener("click", function(e){ if(e.target===pop) closePop(); });
+  document.addEventListener("keydown", function(e){
+    if(!pop.classList.contains("open")) return;
+    if(e.key==="Escape" || e.key==="Esc"){ e.preventDefault(); closePop(); return; }
+    if(e.key==="Tab"){
+      var f = focusables(); if(!f.length) return;
+      var first = f[0], last = f[f.length-1], a = document.activeElement;
+      if(!dlg.contains(a)){ e.preventDefault(); first.focus(); }
+      else if(e.shiftKey && a===first){ e.preventDefault(); last.focus(); }
+      else if(!e.shiftKey && a===last){ e.preventDefault(); first.focus(); }
+    }
+  });
+  var returning = false;
+  try{ returning = new URLSearchParams(location.search).get("paid")==="1"; }catch(_){}
+  if(!returning && !seen()){ setTimeout(openPop, 500); }
+})();
 
 setPane(0,false);
 })();
